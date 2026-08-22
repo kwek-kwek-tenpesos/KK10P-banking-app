@@ -1,0 +1,1 @@
+Create README.md explaining that the system is an educational banking simulator.
