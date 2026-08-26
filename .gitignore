@@ -1,1 +1,33 @@
-Create a .gitignore covering .NET, Flutter, IDE, .env, user secrets exports, build output and local database artifacts. 
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+
+# .NET generated files
+**/bin/
+**/obj/
+
+# IDE settings
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Test output
+TestResults/
+coverage/
+
+# Flutter generated files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/build/
+**/android/local.properties
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
