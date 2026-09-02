@@ -17,7 +17,7 @@ void main() {
       expect(systemInfo.environment, 'Development');
     });
 
-    test('throws when a required field is missing', () {
+    test('throws a FormatException when a required field is missing', () {
       final incompleteJson = <String, dynamic>{
         'name': 'Banking API',
         'version': 'v1.0.0',
@@ -25,7 +25,7 @@ void main() {
 
       expect(
         () => SystemInfo.fromJson(incompleteJson),
-        throwsA(isA<TypeError>()),
+        throwsA(isA<FormatException>()),
       );
     });
   });

@@ -1,5 +1,5 @@
 import 'package:banking_mobile/core/config/app_config.dart';
-import 'package:banking_mobile/main.dart';
+import 'package:banking_mobile/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/widget_previews.dart';

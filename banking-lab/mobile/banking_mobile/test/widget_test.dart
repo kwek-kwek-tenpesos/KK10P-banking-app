@@ -1,7 +1,7 @@
 import 'package:banking_mobile/core/config/app_config.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
-import 'package:banking_mobile/main.dart';
+import 'package:banking_mobile/app/app.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

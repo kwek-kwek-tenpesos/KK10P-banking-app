@@ -1,8 +1,9 @@
-import 'package:banking_mobile/core/network/dio_provider.dart';
+import 'package:banking_mobile/core/api/dio_provider.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:banking_mobile/core/errors/app_failure.dart';
 
 void main() {
   group('systemInfoProvider', () {
@@ -44,7 +45,7 @@ void main() {
       expect(systemInfo.environment, 'Development');
     });
 
-    test('forwards a network failure as an error', () async {
+    test('maps a Dio connection error to NetworkFailure', () async {
       final dio = Dio(BaseOptions(baseUrl: 'http://example.test'));
 
       addTearDown(() {
@@ -73,7 +74,7 @@ void main() {
 
       await expectLater(
         container.read(systemInfoProvider.future),
-        throwsA(isA<DioException>()),
+        throwsA(isA<NetworkFailure>()),
       );
     });
   });

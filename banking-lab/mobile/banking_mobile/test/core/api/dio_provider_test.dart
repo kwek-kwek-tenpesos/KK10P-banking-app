@@ -1,5 +1,5 @@
 import 'package:banking_mobile/core/config/app_config.dart';
-import 'package:banking_mobile/core/network/dio_provider.dart';
+import 'package:banking_mobile/core/api/dio_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

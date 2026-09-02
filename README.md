@@ -102,6 +102,9 @@ banking-lab/
 
   mobile/
     banking_mobile/          Flutter mobile application and tests
+      lib/app/               Startup wiring and application shell
+      lib/core/api/          Shared API client configuration
+      lib/features/          Feature-first mobile capabilities
 
   infrastructure/
     compose/                 Local PostgreSQL Compose configuration

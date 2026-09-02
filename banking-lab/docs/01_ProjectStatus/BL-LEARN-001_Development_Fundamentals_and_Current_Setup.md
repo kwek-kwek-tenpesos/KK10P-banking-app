@@ -285,18 +285,30 @@ A migration contains:
 
 ## 11. Flutter and Android Fundamentals
 
-The Flutter entry point is `mobile/banking_mobile/lib/main.dart`.
+The Flutter entry point is `mobile/banking_mobile/lib/main.dart`. It now delegates startup to `lib/app/bootstrap.dart`, while `lib/app/app.dart` contains the application-level widget.
 
 Application startup currently performs these steps:
 
-1. Read `API_BASE_URL` from `--dart-define`.
-2. Validate that it is a complete URL.
-3. Create Riverpod's root `ProviderScope`.
-4. Override `appConfigProvider` with the validated configuration.
-5. Mount `BankingLabApp`.
-6. Display `SystemInfoScreen`.
+1. `main()` calls `bootstrap()`.
+2. `bootstrap()` reads `API_BASE_URL` from `--dart-define`.
+3. `AppConfig` validates that it is a complete URL.
+4. `bootstrap()` creates Riverpod's root `ProviderScope`.
+5. It overrides `appConfigProvider` with the validated configuration.
+6. It mounts `BankingLabApp` from `app.dart`.
+7. `BankingLabApp` displays `SystemInfoScreen`.
 
 `BankingLabApp` is a `StatelessWidget` responsible for application-level configuration such as the Material theme and starting screen.
+
+This separation gives each file one main responsibility:
+
+| File | Responsibility |
+| --- | --- |
+| `lib/main.dart` | Small executable entry point |
+| `lib/app/bootstrap.dart` | Configuration and root dependency wiring |
+| `lib/app/app.dart` | Material application, theme, and starting screen |
+| `lib/core/api/dio_provider.dart` | Shared Dio API client configuration |
+
+The refactor changes file organization only. It preserves the API base URL, Dio settings, Riverpod override, starting screen, UI states, and request behavior.
 
 `SystemInfoScreen` is a `ConsumerWidget`. A `ConsumerWidget` can use a `WidgetRef` to watch Riverpod providers.
 
@@ -509,6 +521,7 @@ Do not make every object a singleton. Shared infrastructure may benefit from con
 | Retry behavior | Verified |
 | Flutter analyzer | Passed |
 | Flutter automated tests | Passed |
+| Flutter startup structure (`main`, bootstrap, app shell) | Implemented and verified |
 | Flutter-to-ASP.NET request | Verified on physical phone |
 | Authentication and authorization | Not implemented |
 | Accounts, balances, transfers, and transactions | Not implemented |

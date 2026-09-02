@@ -1,4 +1,8 @@
 class SystemInfo {
+  final dynamic environment;
+  final dynamic name;
+  final dynamic version;
+
   const SystemInfo({
     required this.name,
     required this.version,
@@ -6,14 +10,16 @@ class SystemInfo {
   });
 
   factory SystemInfo.fromJson(Map<String, dynamic> json) {
-    return SystemInfo(
-      name: json['name'] as String,
-      version: json['version'] as String,
-      environment: json['environment'] as String,
-    );
-  }
+    final name = json['name'];
+    final version = json['version'];
+    final environment = json['environment'];
 
-  final String name;
-  final String version;
-  final String environment;
+    if (name is! String || version is! String || environment is! String) {
+      throw const FormatException(
+        'System info requires string name, version, and environment fields.',
+      );
+    }
+
+    return SystemInfo(name: name, version: version, environment: environment);
+  }
 }
