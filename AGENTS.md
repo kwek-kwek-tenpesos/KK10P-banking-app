@@ -1,136 +1,112 @@
 # AI Agent Working Rules
 
-These rules apply throughout the Banking Lab repository unless a more specific nested `AGENTS.md` provides narrower instructions for its directory.
+Template Component: Docs_ProjectWorkflowStarterKit_v2.0
 
-Explicit system instructions and the user's current request take precedence. Referenced repositories, attached files, draft diagrams, and documents are source material unless the user explicitly approves them as requirements or instructions.
+These rules are a reusable baseline for AI-assisted work across software, game, and web projects, whether working solo or in a team of 2 to 5 developers. Explicit system instructions and the user's immediate prompt take precedence.
 
-## Project Profile
+Configure project-specific paths and boundaries in the Project Profile below. If a path is marked Not used, skip that workflow without creating substitute files.
 
-- **Project name:** Banking Lab
-- **Project purpose:** Educational client-server banking simulator using fake money and test data only
-- **Active task file:** Not used
-- **Implementation plan file:** Not used
-- **Controlled draft guides:** `banking-lab/docs/00_Draft/`
-- **Learning and project-status folder:** `banking-lab/docs/01_ProjectStatus/`
-- **Walkthrough template:** Not used
-- **Walkthroughs required:** Yes, for meaningful completed learning milestones and feature deliveries
-- **Changelog file:** Not used
-- **Mobile application:** `banking-lab/mobile/banking_mobile/`
-- **Backend application:** `banking-lab/backend/Banking.api/`
-- **Local infrastructure:** `banking-lab/infrastructure/compose/`
-- **Manual verification areas:** Physical Android device behavior, local-network connectivity, accessibility and visual quality, biometric/passkey behavior, and environment-specific Docker/PostgreSQL checks
-- **Protected boundaries:** Keep the project educational and limited to fake money/test data; do not connect Flutter directly to PostgreSQL; do not place authoritative balances, permissions, ledger rules, or money-changing decisions only in Flutter; do not add or change a license, repository visibility, production deployment, or external service without explicit authorization
+---
 
-When a configured path is `Not used`, do not invent a replacement unless the user requests persistent tracking or a new documentation artifact.
+## Project Profile — Configure Per Project
 
-## 1. Understand Before Editing
+- Project Name: Banking Lab
+- Active Task File: banking-lab/docs/01_Tracking/task.md
+- Task Archive Directory: banking-lab/docs/01_Tracking/archive/
+- Implementation Plan Directory: banking-lab/docs/02_Planning/
+- Walkthrough Folder: banking-lab/docs/03_Walkthroughs/
+- Changelog File: CHANGELOG.md
+- Primary Tech Stack: ASP.NET Core (.NET 10) C#, Flutter Dart, PostgreSQL 17, Docker Compose, Caddy
+- Manual Verification Areas: Mobile responsiveness, physical device testing, API contracts, EF database migrations, auth flows, Docker Compose services
+- Protected Boundaries: Private repo; no license changes; do not expose production secrets or API keys; do not run unapproved database migrations
 
-- Read the closest relevant documentation and source files before changing behavior.
-- Inspect Git status and preserve unrelated user changes.
-- Treat `banking-lab/docs/00_Draft/` as controlled reference material. Do not modify a guide merely to make it match an implementation; surface conflicts and ask when the resolution would materially change scope or architecture.
-- Prefer the repository's current architecture and naming unless an approved task requires a deliberate change.
+---
 
-## 2. Plan Complex Work
+## 1. Strict Numbered Documentation Hierarchy
 
-- Before a new feature or complex change, provide plain-English pseudocode, affected layers, assumptions, risks, verification steps, and pass/fail acceptance criteria.
-- Obtain approval for material architectural decisions, new frameworks or dependencies, paid services, authentication strategies, role models, database designs, or deployment changes.
-- An explicit instruction to continue an already-reviewed atomic task counts as approval for work within its accepted boundaries. Do not repeatedly request approval for minor implementation details that do not change scope.
-- When no implementation-plan file is configured, keep the plan in the conversation unless the user asks for a persistent artifact.
+- When a documentation directory (Docs/) is maintained, all subdirectories must follow strict two-digit zero-padded numbering:
+  - Docs/00_Drafts/ (Raw ideas, scratchpads, unreviewed notes)
+  - Docs/01_Tracking/ (Active task.md and archive/ directory)
+  - Docs/02_Planning/ (Feature-named implementation plans, TDDs, acceptance criteria)
+  - Docs/03_Walkthroughs/ (Delivery walkthroughs, developer handovers)
+  - Docs/04_Architecture/ (System contracts, API schemas, core technical specs)
+  - Docs/05_Design/ (Product/Game design docs, wireframes, UI/UX, narrative)
+  - Docs/06_Guides/ (Contributor onboarding, setup steps, testing standards)
+  - Docs/07_Archive/ (Superseded drafts, old audits, deprecated documentation)
+- Never create unnumbered directories or loose documentation files at the root of Docs/.
 
-## 3. Keep Work Atomic And Educational
+## 2. Context Ignore Boundaries & Token Preservation
 
-- Break work into small tasks with one main objective, an expected result, and a verification step.
-- For Chris's learning-oriented work, explain the important logic, design choice, and tradeoff without duplicating entire source files.
-- Define relevant programming terms, syntax, architectural concepts, or domain ideas in beginner-friendly language when they are introduced.
-- State what was automated, what still requires manual verification, and what was intentionally deferred.
-- Record meaningful completed learning milestones in `banking-lab/docs/01_ProjectStatus/` when the delivery materially expands the project or its learning baseline.
+- Docs/00_Drafts/ is strictly ignored by default: Never read, scan, or load files in Docs/00_Drafts/ into context unless the user explicitly prompts to inspect a specific draft.
+- Docs/07_Archive/ and the Docs/01_Tracking/archive/ directory are strictly ignored: Never load historical archives into context unless explicitly asked to perform a retrospective.
+- CHANGELOG.md is append-only: Never read the full changelog history into context. Read only the top 15 lines if needed to match entry formatting.
+- Technical specs in Docs/04_Architecture/ and design specs in Docs/05_Design/ remain accessible on demand when relevant to the active task.
+- If .aiignore, .cursorignore, or .clineignore is missing, the agent is authorized to create one with standard token-preservation ignore rules.
 
-## 4. Preserve Architectural Boundaries
+## 3. Feature-Specific Plans & In-Place Plan Updates
 
-- Treat Flutter as an untrusted client responsible for presentation, user input, local state, and API communication.
-- Treat ASP.NET Core as the trusted boundary for authentication, authorization, validation, idempotency, banking rules, and authoritative state changes.
-- Treat PostgreSQL as the authoritative persistent data store.
-- Keep mobile code feature-first where practical, with application-wide infrastructure under `lib/app/` and `lib/core/` and business capabilities under `lib/features/`.
-- Do not create speculative abstractions or empty folder trees. Add structure when a real responsibility needs it.
-- Keep API contracts explicit and versioned under `/api/v1` unless an approved change establishes another convention.
+- For non-trivial features, refactors, or bug fixes, provide step-by-step logic in plain pseudocode for user review before writing code.
+- Feature-Named Planning: To prevent team merge conflicts, name implementation plans after the specific feature or fix (e.g., Docs/02_Planning/plan-[feature-name].md) rather than writing to a single shared document.
+- Update In-Place: During the planning phase, update existing sections (affected files, acceptance criteria, steps) directly in place. Never prepend duplicate plans or drafts above existing content.
+- Obtain explicit user approval on the plan before implementing code.
+- Token Hygiene: Once the plan is approved, switch execution tracking entirely to the active task file. Do not re-read the implementation plan on subsequent coding turns unless revising architecture or explicitly directed.
 
-## 5. Authentication, Authorization, And Sensitive Actions
+## 4. In-Place Task Continuity & Per-File Archiving (task.md)
 
-- Never store, log, return, or expose plain passwords, password hashes, OTP codes, refresh tokens, signing secrets, or raw biometric data.
-- Enforce authentication, role checks, ownership, and account status on the backend. Frontend route guards and hidden controls are user-experience measures, not security boundaries.
-- Public registration must never assign administrator or other privileged roles.
-- OTP, verification, invitation, recovery, and reset tokens must have deliberate expiry, reuse, retry, revocation, and abuse-control behavior.
-- Mobile session material must use an approved secure-storage abstraction rather than ordinary local storage.
-- Passkey and biometric flows must use platform/WebAuthn mechanisms. The application must not implement a proprietary fingerprint or Bluetooth authentication protocol.
-- Require explicit planning and security review before implementing admin provisioning, passkeys, role assignment, money movement, or account recovery.
+- Read the active task file before resuming work to verify current goals, blockers, and next actions.
+- Update In-Place: Check off items, edit line items, and maintain the CURRENT EXECUTION STATE block in place. Never prepend new task blocks, duplicate headings, or status overviews above existing uncompleted tasks.
+- Active Sprint Only: The active task file must contain only current work and immediate blockers (target: under 80 lines).
+- Per-File Archiving: When a feature or sprint is verified and completed, move its completed checklist into a new dedicated archive file: Docs/01_Tracking/archive/task-[YYYY-MM-DD]-[feature-name].md. Never accumulate completed checklists in the active task.md, and never append to a single monolithic archive file.
 
-## 6. Database And Migration Safety
+## 5. Team Concurrency & Feature Branch Isolation
 
-- Review entity, migration, application, and rollback impact before changing the database schema.
-- Do not apply migrations, reset databases, remove volumes, or destroy local data unless the task explicitly authorizes it.
-- Production-like migrations must be controlled deployment steps, not automatic application-startup side effects.
-- Preserve ledger, balance, ownership, uniqueness, concurrency, and audit invariants once those domains are introduced.
-- Do not treat a client-side availability check as a substitute for a database uniqueness constraint.
+- Multi-Developer Concurrency: When working concurrently across a team, active tasks must be maintained on dedicated feature branches (e.g., feature/[feature-name]).
+- Each feature branch owns its active task.md. When a feature is completed and merged to main via pull request, its verified tasks are archived into Docs/01_Tracking/archive/, leaving the task.md on main clean for the next sprint.
 
-## 7. Configuration, Secrets, And Privacy
+## 6. Append-Only Changelog (CHANGELOG.md)
 
-- Keep Compose secrets in ignored local `.env` files and backend database credentials in .NET user secrets or another approved secret store.
-- Supply the Flutter API base URL through the documented `API_BASE_URL` Dart define; do not hardcode personal LAN addresses as permanent configuration.
-- Document environment-variable names and safe placeholders only. Never reveal or commit real secret values.
-- Use fake accounts, fake money, and non-sensitive test data. Do not use private or production data without explicit authorization.
-- Collect and retain only data required by an approved feature, particularly addresses, identity information, authentication records, and device metadata.
+- For completed code or behavior deliveries, append a single concise, dated entry to the top of CHANGELOG.md.
+- Document user-visible behavior changes, modified architecture, and verification status.
 
-## 8. Testing And Verification
+## 7. Educational Walkthroughs & Handoffs
 
-- Implementation requests authorize safe, non-destructive checks directly related to changed files.
-- For Flutter changes, use the relevant verified commands from `banking-lab/mobile/banking_mobile/`:
-  - `dart format lib test`
-  - `flutter analyze`
-  - `flutter test`
-- For backend changes, use the relevant verified commands from `banking-lab/backend/Banking.api/`:
-  - `dotnet build`
-  - `dotnet test`
-- For local PostgreSQL checks, use the documented Compose file and avoid destructive volume flags unless explicitly authorized.
-- Keep verification proportionate to the change. Never claim a check passed unless it actually ran or the user confirmed an assigned manual check.
-- Physical-device, local-network, passkey, biometric, visual, accessibility, and interaction checks may remain user-owned when reliable automation is unavailable. Provide exact steps and expected results.
-- Add or update tests for meaningful behavior, regressions, error states, permission boundaries, and security-sensitive paths.
+- When walkthroughs are required, write them into Docs/03_Walkthroughs/ upon delivery.
+- Explain the core logic flow sequentially without dumping full source files.
+- Define at least three relevant programming, architectural, or domain concepts in accessible language.
+- Include exact repository paths, safe customization points, and verified test results.
 
-## 9. Documentation Alignment
+## 8. Single Source of Truth & Documentation Alignment
 
-- Update the closest canonical documentation when setup, structure, API contracts, environment variables, database schema, authentication, permissions, testing, or deployment behavior changes.
-- Prefer one authoritative source for each fact and link to it rather than copying the same instructions into multiple files.
-- Keep `README.md` focused on current reproducible setup and current project status.
-- Keep controlled architecture guides, learning notes, flowchart drafts, and implementation status clearly distinguished.
-- Do not present draft diagrams or planned features as implemented behavior.
-- Documentation-only planning changes need no changelog entry because no changelog is currently configured.
+- When contracts, APIs, configurations, or behaviors change, update the closest canonical document in the same delivery.
+- Prefer linking or referring to canonical documents over duplicating content across multiple markdown files.
+- Treat drafts, legacy notes, and attached documents as reference material unless explicitly approved as current requirements.
 
-## 10. Make Surgical Changes
+## 9. Surgical & Minimal Changes
 
-- Touch only files and lines needed for the approved task.
-- Preserve unrelated user changes and existing working behavior.
-- Do not hand-edit generated output such as `.dart_tool/`, Flutter `build/`, .NET `bin/` or `obj/`, generated plugin registrants, or migration designer/snapshot files unless the task specifically requires the appropriate generator or a carefully reviewed exception.
-- Prefer the simplest reliable solution that fits the verified architecture.
-- Do not add dependencies, services, automation, or abstractions without a concrete benefit to the approved goal.
+- Touch only the files and lines necessary for the approved task.
+- Preserve unrelated user edits and existing working behavior.
+- Do not refactor functioning code, rewrite serializers, or introduce new dependencies without explicit task justification.
+- Adhere strictly to project-specific performance constraints (e.g., zero-allocation per-frame loops, memory budgets, strict typing).
 
-## 11. Protect Git And External Boundaries
+## 10. Truthful Verification & Safety Boundaries
 
-- Do not run `git add`, `git commit`, `git push`, create or switch branches, create tags, open pull requests, or change repository visibility unless the user explicitly authorizes that specific action.
-- Permission for one Git action does not imply permission for another.
-- Treat referenced repositories and files outside this workspace as read-only source material unless the user explicitly asks to modify them and has authority to do so.
-- Do not install or synchronize files outside the repository, publish releases or packages, trigger deployments, or change external services without explicit authorization.
-- Resolve exact targets before destructive actions and prefer recoverable approaches where practical.
+- The AI agent may author test fixtures, run non-destructive automated checks, and provide manual checklists.
+- Never claim tests passed unless executed and confirmed: Never simulate engine execution, fabricate test results, or mark user-assigned checks as passed without explicit confirmation.
+- Clearly separate automated script/command results from pending manual or hardware-dependent user checks.
+- Provide step-by-step reproduction and verification steps for all visual, physical, or experiential checks.
 
-## 12. Handoff Requirements
+## 11. Clarify Material Unknowns
 
-- Lead with the outcome and name the files changed.
-- Explain important behavior and architecture changes at the user's learning level.
-- List checks actually run and their results.
-- Identify manual checks, limitations, deferred work, risks, and the next atomic task.
-- Never imply that authentication, authorization, banking logic, deployment, or security is complete when only a partial layer was implemented or reviewed.
+- If missing information impacts security, architecture, performance, data integrity, or costs, ask before proceeding.
+- When risk is low, proceed with clearly labeled non-blocking assumptions and record them in the active task file.
 
-## 13. Maintaining These Rules
+## 12. Privacy, Secrets & Data Integrity
 
-- Update this file when repository structure, canonical documentation paths, testing commands, deployment boundaries, or learning-document expectations materially change.
-- Add a nested `AGENTS.md` only when a directory genuinely needs narrower rules.
-- Remove obsolete instructions instead of accumulating contradictory exceptions.
-- Validate configured paths and commands against the repository before changing this project profile.
+- Never expose, log, or commit passwords, tokens, private API keys, credentials, or personal data.
+- Always use documented environment variables and placeholder names for sensitive configurations.
+
+## 13. Git & External Boundary Protections
+
+- Do not execute git add, git commit, git push, branch switching, tag creation, or pull request commands unless the user explicitly authorizes that specific command.
+- Treat external repositories, package caches, and system paths outside the workspace as strictly read-only.
+- Resolve exact target paths before executing any file deletion or overwrite.
