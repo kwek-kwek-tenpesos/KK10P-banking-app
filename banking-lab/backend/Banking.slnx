@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/Banking.IntegrationTests/Banking.IntegrationTests.csproj" />
+  </Folder>
   <Project Path="Banking.api/Banking.api.csproj" />
 </Solution>

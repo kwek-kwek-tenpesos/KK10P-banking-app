@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:banking_mobile/features/system_info/presentation/screens/system_info_screen.dart';
@@ -44,7 +45,7 @@ void main() {
         overrides: [
           systemInfoProvider.overrideWith((ref) async {
             requestCount++;
-            throw Exception('Backend unavailable');
+            throw const NetworkFailure();
           }),
         ],
         child: const MaterialApp(home: SystemInfoScreen()),
@@ -54,6 +55,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Could not connect to the Banking API.'), findsOneWidget);
+    expect(
+      find.text(
+        'Unable to reach the server. Check your connection and try again.',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Try again'), findsOneWidget);
     expect(requestCount, 1);
 

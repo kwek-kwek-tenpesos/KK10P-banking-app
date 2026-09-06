@@ -15,5 +15,16 @@ services:
       timeout: 3s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:v1.31.0
+    profiles: ["email"]
+    restart: "no"
+    environment:
+      MP_MAX_MESSAGES: "100"
+      MP_DATABASE: /tmp/mailpit.db
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
 volumes:
   banking_pgdata:

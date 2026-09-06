@@ -1,0 +1,7 @@
+# ZAP rule configuration for Banking Lab REST API
+# Format: <ruleId> TAB <IGNORE|INFO|WARN|FAIL> TAB <comment>
+# Applies only to the diagnostic JSON GET scope, not authentication or browser pages.
+# 10038: Content Security Policy (CSP) Header Not Set - Not applicable to pure JSON REST APIs
+10038	IGNORE	CSP header not applicable for pure JSON REST API
+# 10096: Timestamp Disclosure - Unix
+10096	INFO	Timestamp disclosure in date responses

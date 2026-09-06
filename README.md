@@ -1,17 +1,27 @@
 
 # Banking Lab
 
-Banking Lab is an educational client-server banking simulator built to learn mobile development, backend APIs, databases, testing, security, and deployment concepts.
+Banking Lab is an educational client-server banking simulator built to learn mobile development, backend APIs, databases, testing, security, and deployment concepts. Its delivery target is a genuinely functional, no-paid-service prototype suitable for a public GitHub showcase: identities and money remain fake, but the approved customer flows must work end to end rather than being decorative mock screens.
+
+The customer-facing app is named **KK10P Bank**. Banking Lab remains the internal project name; package identifiers and repository paths are unchanged. See the [approved app identity and visual direction](banking-lab/docs/01_Tracking/BL-LEARN-001_Development_Fundamentals_and_Current_Setup.md#approved-app-identity-and-visual-direction) for the planned interface style.
 
 > Banking Lab uses fake money and test data only. It is not intended for real deposits, payment cards, regulated transactions, or production banking credentials.
 
+The repository is intended as a public showcase. No license is added by this implementation work; publishing, visibility and licensing changes remain explicit owner decisions.
+
 ## Current Milestone
 
-The project is completing `BL-SETUP-001`, the development-environment and repository-setup milestone.
+The `BL-SETUP-001` foundation and authentication repair batches A/B/C are delivered. Customer sessions enforce 15-day inactivity and 90-day absolute expiry. The [end-to-end customer authentication delivery](banking-lab/docs/03_Walkthroughs/walkthrough-end-to-end-customer-authentication.md) now adds genuine SMTP confirmation, mobile login/session restoration/logout and protected routing. Verification on 2026-09-05 passed 176 database-free backend tests, all six guarded PostgreSQL tests, 73 Flutter tests, clean Flutter analysis, a local registration-to-logout Mailpit journey and the complete physical-phone journey over Tailscale Serve HTTPS. No ZAP scan ran.
 
-Implemented and verified:
+Authentication progress: registration, verification/resend, login, refresh/logout and protected `/api/v1/auth/me` endpoints are implemented. Flutter has registration, confirmation, login, secure refresh-token storage, restore/retry, logout, diagnostics and protected Home. The shared session migration is current, a private JWT key and local Mailpit settings are stored in .NET user-secrets, and the [current authentication contract](banking-lab/docs/04_Architecture/customer-authentication-contract.md) is the source of truth. Mailpit is local development infrastructure, not a production email provider.
 
-- PostgreSQL 17 running locally through Docker Compose
+The [accounts/balances implementation](banking-lab/docs/03_Walkthroughs/walkthrough-accounts-and-balances.md) adds owner-only GET/idempotent PUT `/api/v1/accounts/me`, explicit opening at PHP 0.00, a persisted zero-only account model and Home account states with session-safe retries. On 2026-09-06, 196 database-free backend tests and 101 Flutter tests passed with clean analysis; ten PostgreSQL tests were skipped. The additive account migration is generated but unapplied. Disposable PostgreSQL verification, shared rollout and phone checks remain gated. Use the [accounts contract](banking-lab/docs/04_Architecture/customer-accounts-contract.md) for current behavior.
+
+[Batch C and follow-up review](banking-lab/docs/03_Walkthroughs/walkthrough-authentication-repair-batch-c.md) corrected an expiry-during-persistence exception and hardened the scanner wrapper. `pwsh -NoProfile -File banking-lab/scripts/run-zap-scan.ps1` is now a no-network/no-write preview; `pwsh -NoProfile -File banking-lab/scripts/test-zap-scan.ps1` runs offline guard checks. Actual scanning/downloads need separate approval. Initial scan coverage is diagnostic GET only, not authentication. Generated SDK and raw ZAP folders are ignored but not deleted.
+
+Existing implementation and historical verification:
+
+- PostgreSQL 17 configured and previously verified locally through Docker Compose; it may remain stopped for database-free work
 - ASP.NET Core API running on .NET 10
 - Entity Framework Core with the Npgsql PostgreSQL provider
 - Initial `SetupProbe` database migration
@@ -19,24 +29,34 @@ Implemented and verified:
 - Flutter Android application running on a physical device
 - Environment-aware Flutter API base URL
 - Dio HTTP client configuration
+- Shared typed failures for network, timeout, server, malformed-response, cancellation, and unexpected errors
+- Central Dio-to-`AppFailure` error mapping
+- Explicit validation of the `SystemInfo` API response
+- User-safe typed error messages with retry behavior
 - Typed `SystemInfo` Dart model
 - API service and repository layers
 - Riverpod providers and dependency overrides
 - Loading, success, failure, and retry UI states
 - Flutter unit and widget tests
 - First live Flutter-to-ASP.NET request
+- Backend Identity service registration with the existing EF user store (foundation only)
+- Backend tests for system info, EF model mapping and Identity service/password wiring
+- Customer email/display-name validation and Identity model/migration-shape tests; migration application is recorded in the prior delivery walkthrough, not newly verified here
+- NFC password preparation, 15-128 Unicode-code-point validation, an initial exact-match offline blocklist and ASP.NET Identity hashing tests
+- Registration, verification/resend, login, refresh, logout and protected-profile endpoint tests
+- Provider-neutral SMTP delivery with an optional loopback-only Mailpit Compose profile
+- Mobile authentication state, secure refresh-token persistence and `go_router` protected navigation
 
 Not implemented yet:
 
-- Registration and login
-- Authentication or authorization
-- Accounts and balances
+- Verified HTTPS Android App Links for a future public release; the current custom scheme is prototype-only
+- Authentication recovery, verified App Links and operational security controls
+- Funding/nonzero balances; account code is implemented but migration rollout and real-database/device verification remain pending
 - Transfers and ledger rules
 - Transaction history
 - Production deployment
 - Production HTTPS and security hardening
 - CI/CD pipeline
-- Dedicated backend automated test project
 
 ## Project Architecture
 
@@ -44,7 +64,7 @@ Not implemented yet:
 Android phone
 Flutter mobile application
         |
-        | HTTP requests and JSON responses
+        | HTTPS requests and JSON responses through Tailscale Serve (phone auth)
         v
 ASP.NET Core backend API
         |
@@ -60,23 +80,23 @@ Future banking operations must pass through ASP.NET Core, where authentication, 
 ## Current End-to-End Flow
 
 ```text
-SystemInfoScreen
-    -> Riverpod FutureProvider
-    -> SystemInfoRepository
-    -> SystemInfoApiService
-    -> Dio GET /api/v1/system/info
-    -> ASP.NET Core endpoint
-    -> JSON response
-    -> typed SystemInfo model
-    -> loading, success, or failure UI
+Register -> SMTP verification -> confirm deep link -> Login
+    -> ASP.NET Core Identity and persisted session family
+    -> access token in memory + rotating refresh token in secure storage
+    -> protected GET /api/v1/auth/me
+    -> authenticated Home
+    -> Logout revokes family and clears local credentials
+
+Diagnostics -> Dio GET /api/v1/system/info -> typed success/failure UI
 ```
 
-The values displayed by Flutter come from the backend response and are not hardcoded in the screen.
+Identity and diagnostic values displayed by Flutter come from backend responses and are not hardcoded in the screens.
 
 ## Technology Stack
 
+
 | Area                   | Technology              | Current purpose                           |
-| ---------------------- | ----------------------- | ----------------------------------------- |
+| ------------------------ | ------------------------- | ------------------------------------------- |
 | Mobile language        | Dart                    | Flutter application code                  |
 | Mobile framework       | Flutter                 | Android UI and client behavior            |
 | State and dependencies | Riverpod                | State management and dependency injection |
@@ -86,11 +106,11 @@ The values displayed by Flutter come from the backend response and are not hardc
 | ORM                    | Entity Framework Core   | C# entity and database mapping            |
 | PostgreSQL provider    | Npgsql                  | EF Core communication with PostgreSQL     |
 | Database               | PostgreSQL 17           | Local relational data storage             |
-| Local infrastructure   | Docker Compose          | PostgreSQL container and volume           |
+| Local infrastructure   | Docker Compose          | PostgreSQL and optional Mailpit containers |
 | Mobile testing         | Flutter Test            | Unit and widget tests                     |
 | Version control        | Git                     | Source and documentation history          |
 
-Some installed Flutter packages, including `go_router`, Freezed, JSON serialization, and secure storage, are intended for later architecture tasks and are not fully used yet.
+`go_router` and secure storage are now active parts of authentication. Freezed and generated JSON serialization remain available for later features but are not required by the current hand-written bounded contracts.
 
 ## Repository Structure
 
@@ -99,6 +119,7 @@ banking-lab/
   backend/
     Banking.slnx
     Banking.api/             ASP.NET Core API and EF migrations
+    tests/Banking.IntegrationTests/  Backend API integration tests
 
   mobile/
     banking_mobile/          Flutter mobile application and tests
@@ -111,8 +132,14 @@ banking-lab/
     temporary/               Temporary setup AppDbContext and entity
 
   docs/
-    00_Draft/                Controlled architecture and engineering guides
-    01_ProjectStatus/        Current learning and progress documentation
+    00_Drafts/               Draft/reference material; ignored by default
+    01_Tracking/             Active task, historical learning notes and task archives
+    02_Planning/             Feature and repair plans
+    03_Walkthroughs/          Delivery explanations and verification records
+    04_Architecture/          Architecture documents
+    05_Design/                Design specifications
+    06_Guides/                Setup and contributor guides
+    07_Archive/               Superseded documentation
 
   scripts/                   Reserved for future helper scripts
 ```
@@ -174,8 +201,9 @@ docker compose -f banking-lab/infrastructure/compose/compose.dev.yml ps
 
 Expected database configuration:
 
-| Setting  | Value                                 |
-| -------- | ------------------------------------- |
+
+| Setting  | Value                               |
+| ---------- | ------------------------------------- |
 | Host     | `localhost`                         |
 | Port     | `5432`                              |
 | Database | `banking_lab`                       |
@@ -250,13 +278,15 @@ If it is not installed, install the .NET 10-compatible tool:
 dotnet tool install --global dotnet-ef --version "10.*"
 ```
 
-## 4. Apply the Database Migration
+## 4. Initial Database Setup and Migration Safety
 
-Make sure PostgreSQL is healthy, then run:
+The shared `banking_lab` database was backed up and verified before applying the exact `20260904152654_AddCustomerSessions` migration on 2026-09-05. Its history, nullable compatibility link, session table, indexes and restrictive foreign keys were verified afterward. Do not run an unqualified `dotnet ef database update`; inspect history, review every pending migration and approve the exact target first.
+
+For an explicitly authorized initial setup of a new database only, make sure PostgreSQL is healthy, then target the initial migration:
 
 ```powershell
 dotnet ef migrations list
-dotnet ef database update
+dotnet ef database update InitialSetupProbe
 ```
 
 The initial migration is:
@@ -272,7 +302,39 @@ It creates:
 
 `SetupProbes` is temporary and exists only to verify the EF Core and PostgreSQL setup.
 
+Skip this setup step if the database is already initialized. Do not target `InitialSetupProbe` on a database with newer migrations: that would roll them back and could delete authentication data. See the [slice 2A migration review](banking-lab/docs/01_Tracking/BL-LEARN-001_Development_Fundamentals_and_Current_Setup.md#slice-2a-customer-identity-data-and-unapplied-migration) for the isolated-database test and approval gates before applying the new migration.
+
 ## 5. Run the Backend API
+
+### Required authentication configuration
+
+The API refuses startup without a valid private `Jwt:SigningKey` (or `Jwt__SigningKey` environment variable), even for System Info. Generate a random secret outside source control; never restore the removed fallback. The current machine has a generated key in .NET user-secrets, but every new developer must create their own:
+
+```powershell
+$jwtSigningKey = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(48))
+dotnet user-secrets set "Jwt:SigningKey" $jwtSigningKey
+Remove-Variable jwtSigningKey
+```
+
+For the free local verification mailbox, configure the non-secret Mailpit values once from `banking-lab/backend/Banking.api`:
+
+```powershell
+dotnet user-secrets set "Smtp:Enabled" "true"
+dotnet user-secrets set "Smtp:Host" "127.0.0.1"
+dotnet user-secrets set "Smtp:Port" "1025"
+dotnet user-secrets set "Smtp:Security" "None"
+dotnet user-secrets set "Smtp:FromAddress" "no-reply@kk10pbank.local"
+dotnet user-secrets set "Smtp:FromName" "KK10P Bank"
+dotnet user-secrets set "Smtp:ConfirmationLinkBase" "kk10pbank://auth/verify-email"
+```
+
+Start its optional Compose profile only while testing email:
+
+```powershell
+docker compose -f banking-lab/infrastructure/compose/compose.dev.yml --profile email up -d postgres mailpit
+```
+
+Mailpit listens only on `127.0.0.1:1025` (SMTP) and `127.0.0.1:8025` (web/API). Plain SMTP is allowed only to loopback; a future external provider must use TLS. If Mailpit is stopped, registration/resend delivery cannot complete.
 
 ### PC-only access
 
@@ -288,17 +350,9 @@ The local endpoint is:
 http://localhost:5255/api/v1/system/info
 ```
 
-### Physical-phone access
+### Loopback upstream for physical-phone access
 
-For a phone on the same trusted private network, allow ASP.NET Core to listen through the PC’s network interfaces:
-
-```powershell
-dotnet run --urls "http://0.0.0.0:5255"
-```
-
-`0.0.0.0` is a server-listening address. Do not use `0.0.0.0` as the URL on the phone.
-
-This is a local-development HTTP configuration. It is not a production deployment configuration.
+The committed Kestrel endpoint `TailscaleServeUpstream` intentionally listens only on `http://127.0.0.1:5255`. The phone must not connect to that HTTP upstream directly. Tailscale Serve supplies the private HTTPS front door described below; `--urls` does not replace the committed Kestrel endpoint.
 
 Test the endpoint from the PC:
 
@@ -315,6 +369,21 @@ Expected response:
   "environment": "Development"
 }
 ```
+
+### Tailscale HTTPS development access
+
+Credential-bearing phone traffic must use a trusted HTTPS endpoint. After the host and phone are connected to the same authorized tailnet, keep the API upstream on loopback and let Tailscale Serve terminate HTTPS:
+
+```powershell
+tailscale serve --bg --https=443 http://127.0.0.1:5255
+tailscale serve status
+```
+
+Use the exact `https://HOSTNAME.TAILNET.ts.net` URL printed by Tailscale as Flutter's `API_BASE_URL`. Do not commit a personal tailnet hostname and do not substitute a Tailscale IP over HTTP. The API trusts forwarded scheme information only from an exact loopback proxy with a one-hop limit.
+
+Tailscale provides private network connectivity between approved devices. It does not replace application authentication, backend authorization, production HTTPS, or other security controls.
+
+Chris and Gio's approved simulation uses separate fake customer accounts against one shared backend hosted by either person. Hosting the API does **not** grant an application administrator role; admin provisioning remains later work. The machine operator is trusted with development data, so use test identities only. Display names may be shown and need not be unique. Registration and mobile sessions, including the physical-phone Tailscale Serve HTTPS path, are verified. The HTTP example above is diagnostic-only.
 
 The `Development` value comes from `ASPNETCORE_ENVIRONMENT` in `Properties/launchSettings.json`.
 
@@ -369,6 +438,10 @@ The current tests cover:
 - Loading UI
 - Failure UI
 - Retry behavior
+- Typed API error mapping
+- Preservation of server status codes
+- Malformed `SystemInfo` response handling
+- User-safe typed error messages
 
 ## 8. Run Flutter on Android
 
@@ -380,13 +453,13 @@ flutter devices
 
 ### Physical Android phone
 
-Replace `YOUR_PC_IPV4` with the PC’s active private IPv4 address:
+For registration, login and sessions, replace the placeholder with the exact HTTPS MagicDNS URL printed by Tailscale Serve:
 
 ```powershell
-flutter run --dart-define=API_BASE_URL=http://YOUR_PC_IPV4:5255
+flutter run --dart-define=API_BASE_URL=https://YOUR_HOST.YOUR_TAILNET.ts.net
 ```
 
-Example shape only:
+Plain LAN HTTP remains usable only for the unauthenticated diagnostics exercise; the mobile auth service rejects it before sending credentials:
 
 ```powershell
 flutter run --dart-define=API_BASE_URL=http://192.168.x.x:5255
@@ -396,7 +469,7 @@ Do not include Markdown brackets, parentheses, or a missing colon in the URL.
 
 ### Android emulator
 
-The standard Android emulator reaches the host PC using `10.0.2.2`:
+The standard Android emulator reaches the host PC using `10.0.2.2`, but this plain-HTTP example is diagnostics-only unless a trusted HTTPS proxy is placed in front:
 
 ```powershell
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5255
@@ -416,7 +489,7 @@ The API URL is supplied at build/run time instead of being hardcoded throughout 
 
 ## 9. Expected Mobile Result
 
-While ASP.NET Core is running and reachable, the phone should display live values resembling:
+After session restoration, a signed-out phone displays the KK10P Bank login screen. Successful confirmed login displays the protected home greeting using the backend display name. **API diagnostics** remains available and shows live values resembling:
 
 ```text
 Banking API
@@ -430,18 +503,23 @@ Restarting the backend and tapping **Try again** should restore the success scre
 
 ## Development Ports and Configuration
 
-| Value                                   | Used by                     | Purpose                                      |
-| --------------------------------------- | --------------------------- | -------------------------------------------- |
-| `5432`                                | PostgreSQL                  | Local database port                          |
-| `5255`                                | ASP.NET Core                | Local HTTP API port                          |
-| `POSTGRES_PASSWORD`                   | Docker Compose              | Initializes the local PostgreSQL user        |
-| `ConnectionStrings:DefaultConnection` | ASP.NET Core user secrets   | Backend database connection                  |
-| `API_BASE_URL`                        | Flutter`--dart-define`    | Base address of the ASP.NET API              |
+
+| Value                                 | Used by                     | Purpose                                    |
+| --------------------------------------- | ----------------------------- | -------------------------------------------- |
+| `5432`                                | PostgreSQL                  | Local database port                        |
+| `5255`                                | ASP.NET Core                | Local HTTP API port                        |
+| `1025`                                | Mailpit                     | Loopback-only development SMTP             |
+| `8025`                                | Mailpit                     | Loopback-only mailbox web/API              |
+| `POSTGRES_PASSWORD`                   | Docker Compose              | Initializes the local PostgreSQL user      |
+| `ConnectionStrings:DefaultConnection` | ASP.NET Core user secrets   | Backend database connection                |
+| `API_BASE_URL`                        | Flutter`--dart-define`      | Base address of the ASP.NET API            |
 | `ASPNETCORE_ENVIRONMENT`              | ASP.NET Core launch profile | Selects`Development` configuration locally |
 
 No real passwords or credentials should appear in committed configuration or documentation.
 
 ## Available API Endpoints
+
+Current authentication routes are `POST /api/v1/auth/register`, `/api/v1/auth/verify-email`, `/api/v1/auth/resend-verification`, `/api/v1/auth/login`, `/api/v1/auth/refresh`, `/api/v1/auth/logout`, and protected `GET /api/v1/auth/me`. Credential operations require HTTPS and responses use no-store. Registration returns generic `202` after creating/sending or for an existing identity; verification consumes a one-hour token with `204`; resend returns generic `202`; login/refresh return credentials; logout revokes the session family; `/me` exposes only ID and nullable display name. Guards can return `400`, `413`, `429` with `Retry-After`, or `503` for recognized dependency failures. See the [canonical authentication contract](banking-lab/docs/04_Architecture/customer-authentication-contract.md).
 
 ### System Information
 
@@ -482,13 +560,18 @@ From `banking-lab/backend/Banking.api`:
 ```powershell
 dotnet restore
 dotnet build
-dotnet test
 dotnet ef migrations list
-dotnet ef database update
 dotnet run --launch-profile http
 ```
 
-There is currently no dedicated backend test project. `dotnet test` is retained as a setup and future test-suite verification command.
+For the solution build and backend integration test, run from `banking-lab/backend`:
+
+```powershell
+dotnet build .\Banking.slnx
+dotnet test .\tests\Banking.IntegrationTests\Banking.IntegrationTests.csproj
+```
+
+The xUnit suite covers System Info, Identity/model/password behavior, verification delivery, trusted proxy handling, registration, tokens, session deadlines, JWT/session authorization, refresh and logout. On 2026-09-05, 176 database-free cases passed and six opt-in PostgreSQL cases passed separately against only `banking_lab_auth_repair_test`. The latter verify migration upgrade, concurrent refresh/logout, rollback, refresh budgeting and database-failure handling. Without `BANKING_AUTH_TEST_DATABASE` those six explicitly skip and PostgreSQL can remain stopped. Local Mailpit proved adapter wiring, and the complete physical-phone HTTPS journey was also verified manually.
 
 ### Flutter
 
@@ -500,13 +583,14 @@ dart format lib test
 flutter analyze
 flutter test
 flutter devices
-flutter run --dart-define=API_BASE_URL=http://YOUR_API_HOST:5255
+flutter run --dart-define=API_BASE_URL=https://YOUR_HOST.YOUR_TAILNET.ts.net
 ```
 
 While `flutter run` is active:
 
-| Key   | Action                                |
-| ----- | ------------------------------------- |
+
+| Key | Action                                |
+| ----- | --------------------------------------- |
 | `r` | Hot reload                            |
 | `R` | Hot restart                           |
 | `q` | Stop Flutter and return to PowerShell |
@@ -539,18 +623,18 @@ Deleting the Compose volume with `down -v` destroys the local database. Only do 
 
 Confirm:
 
-- Backend was started with `http://0.0.0.0:5255`.
-- Phone and PC use the same trusted private network.
-- Flutter uses the PC’s IPv4 address, not `localhost`.
-- Windows Firewall allows the development process on the private network.
-- The endpoint opens in the phone’s browser.
+- Backend is running and responds locally on port `5255`.
+- Phone and PC are connected to the authorized Tailscale tailnet.
+- `tailscale serve status` shows the loopback API proxy on HTTPS port `443`.
+- Flutter uses the exact HTTPS MagicDNS URL printed by Serve, not `localhost`, a raw IP or plain HTTP.
+- The HTTPS diagnostics endpoint opens in the phone’s browser without a certificate bypass.
 
 ### Flutter reports that `API_BASE_URL` is missing
 
 Start Flutter with:
 
 ```powershell
-flutter run --dart-define=API_BASE_URL=http://YOUR_API_HOST:5255
+flutter run --dart-define=API_BASE_URL=https://YOUR_HOST.YOUR_TAILNET.ts.net
 ```
 
 ### Flutter or Gradle runs out of memory
@@ -585,10 +669,10 @@ If ignored correctly, Git prints the file path.
 
 ## Documentation
 
-Controlled engineering guides:
+Draft/reference engineering guides (not automatically approved requirements):
 
 ```text
-banking-lab/docs/00_Draft/
+banking-lab/docs/00_Drafts/
 ```
 
 Recommended order:
@@ -607,19 +691,19 @@ Recommended order:
 Beginner learning notes:
 
 ```text
-banking-lab/docs/01_ProjectStatus/BL-LEARN-001_Development_Fundamentals_and_Current_Setup.md
+banking-lab/docs/01_Tracking/BL-LEARN-001_Development_Fundamentals_and_Current_Setup.md
 ```
 
 ## Known Limitations
 
 The project currently has:
 
-- No user registration or login
-- No authentication tokens or route protection
-- No account ownership or permission system
-- No balances, transfers, transaction history, or ledger
-- No dedicated backend test project
-- No backend validation or standardized API error model
+- Customer authentication is verified end to end locally and on the physical Android phone; production email and verified App Links remain future work
+- The custom `kk10pbank` URI scheme must become a verified HTTPS App Link before public authentication use
+- Owner-only account endpoints and a zero-balance PHP account model are implemented; account migration rollout is pending
+- No funding, nonzero balances, transfers, transaction history or ledger
+- Four guarded account PostgreSQL tests are authored but not executed; six existing session PostgreSQL tests were skipped in this database-free delivery
+- Backend validation and ProblemDetails exist, but error handling and security controls still need the documented repairs
 - No production database environment
 - No production HTTPS configuration
 - No CI/CD pipeline

@@ -1,0 +1,26 @@
+# Universal AI Context Ignore Rules (Token Preservation)
+
+# Generated local SDK/cache and raw security scan output
+banking-lab/backend/.dotnet/
+banking-lab/reports/zap/
+
+# Ignore full historical logs (append-only)
+**/CHANGELOG.md
+
+# Ignore raw scratchpads and unreviewed brain dumps
+**/00_Drafts/
+**/00_Draft/
+**/Docs/00_Drafts/
+**/Docs/00_Draft/
+
+# Ignore historical archives and superseded tasks
+**/07_Archive/
+**/Archive/
+**/01_Tracking/archive/
+**/task_archive.md
+**/task_history*.md
+
+# Ignore repository workflow manuals (intended for humans only)
+project-workflow-starter-kit.md
+**/ProjectWorkflowStarterKit/
+**/Docs_ProjectWorkflowStarterKit/

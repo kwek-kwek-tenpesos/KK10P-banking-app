@@ -93,5 +93,43 @@ void main() {
 
       expect(identical(mappedFailure, originalFailure), isTrue);
     });
+
+    test(
+      'maps a 400 bad response with validation errors to ValidationFailure',
+      () {
+        final requestOptions = RequestOptions();
+
+        final error = DioException.badResponse(
+          statusCode: 400,
+          requestOptions: requestOptions,
+          response: Response<Map<String, dynamic>>(
+            requestOptions: requestOptions,
+            statusCode: 400,
+            data: {
+              'detail': 'Check the registration fields and try again.',
+              'errors': {
+                'email': ['Enter a valid email address.'],
+                'password': ['Password is too short.'],
+              },
+            },
+          ),
+        );
+
+        final failure = mapApiError(error);
+
+        expect(failure, isA<ValidationFailure>());
+        final validationFailure = failure as ValidationFailure;
+        expect(
+          validationFailure.message,
+          'Check the registration fields and try again.',
+        );
+        expect(validationFailure.fieldErrors['email'], [
+          'Enter a valid email address.',
+        ]);
+        expect(validationFailure.fieldErrors['password'], [
+          'Password is too short.',
+        ]);
+      },
+    );
   });
 }

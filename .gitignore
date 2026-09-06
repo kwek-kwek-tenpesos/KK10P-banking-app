@@ -8,6 +8,10 @@ temp.txt
 **/bin/
 **/obj/
 
+# Local SDK workspace and raw scanner artifacts (retain reviewed summaries in docs)
+/banking-lab/backend/.dotnet/
+/banking-lab/reports/zap/
+
 # IDE settings
 .vs/
 .vscode/

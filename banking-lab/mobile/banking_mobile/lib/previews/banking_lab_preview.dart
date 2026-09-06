@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/widget_previews.dart';
 
-@Preview(name: 'Banking Lab - Phone', size: Size(390, 844))
+@Preview(name: 'KK10P Bank - Phone', size: Size(390, 844))
 Widget bankingLabPreview() {
   return ProviderScope(
     overrides: [
