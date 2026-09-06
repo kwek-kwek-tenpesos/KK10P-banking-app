@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-06 — Physical customer-account verification (customer A)
+- Installed the current debug APK in place on the Infinix device and verified private Tailscale HTTPS diagnostics, local Mailpit registration/confirmation, authenticated unopened state, explicit PHP 0.00 account opening, PostgreSQL persistence, force-stop restoration, recoverable API-outage Retry, 200% text/scroll reachability and server-backed logout. Cross-customer B isolation and TalkBack listening remain pending; no data was reset or deleted and no ZAP scan ran.
+
+### 2026-09-06 — Shared customer-account schema rollout
+- Verified a custom-format backup of shared local `banking_lab`, reviewed the exact forward SQL and applied only `20260906042449_AddCustomerAccounts`. Post-checks confirmed an initially empty account table, PHP/zero constraints, restricted ownership, unique owner indexing, unchanged identity/session/token counts and no pending EF model changes. ZAP remains separately gated.
+
+### 2026-09-06 — Disposable PostgreSQL account verification
+- Created the approved fresh local `banking_lab_accounts_test` target and passed all four guarded account upgrade, concurrency and constraint tests. Confirmed the account migration only in that disposable database; shared `banking_lab`, live API/device behavior and ZAP remain untouched and separately gated.
+
 ### 2026-09-06 — Customer accounts and zero balances
 - Added explicit opening and owner-only retrieval of one PHP simulator account at zero, strict transport/input/cache/rate guards, an additive unapplied account migration, and Flutter Home account/retry states with session-generation and secure-storage race protection. Verified 196 database-free backend tests, 101 Flutter tests and clean analysis; ten PostgreSQL tests were skipped. Database execution, shared rollout, physical-phone checks and ZAP remain pending approval.
 

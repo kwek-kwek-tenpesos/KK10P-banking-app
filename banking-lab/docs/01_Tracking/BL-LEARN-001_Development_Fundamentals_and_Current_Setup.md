@@ -677,7 +677,7 @@ This milestone handles errors in the current System Info vertical slice. It does
 
 The future administrator and transaction-security direction is recorded in:
 
-- `docs/00_Draft/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md`
+- `docs/00_Drafts/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md`
 
 This controlled draft plans one active registered administrator workstation, standards-based phone passkey approval, device-bound proof, controlled stolen-device recovery, narrowly scoped security-authority actions, account restrictions, non-spendable transaction holds and deterministic risk rules. Its AI-guard discussion is concept only, not a planned feature, as clarified by Chris on 4 September 2026.
 
@@ -694,9 +694,9 @@ MOB-005 secure session storage (complete)
     -> account restrictions, held funds and deterministic risk rules
 ```
 
-The [AI guard concept](../00_Draft/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md#9-ai-guard-concept--not-a-planned-feature) is outside this roadmap and has no delivery commitment or MVP acceptance requirement. Any later exploration needs a new explicit approval. Security and money-changing decisions remain in deterministic, authorized and auditable backend workflows regardless of whether that concept is ever pursued.
+The [AI guard concept](../00_Drafts/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md#9-ai-guard-concept--not-a-planned-feature) is outside this roadmap and has no delivery commitment or MVP acceptance requirement. Any later exploration needs a new explicit approval. Security and money-changing decisions remain in deterministic, authorized and auditable backend workflows regardless of whether that concept is ever pursued.
 
-An optional future [Bluetooth Device Approval Simulator](../00_Draft/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md#optional-learning-demo-bluetooth-device-approval-simulator) is planned near the advanced-admin UX phase. It uses real Bluetooth messages with fake approval requests, has no banking privileges and does not replace real passkeys or backend authentication. Its scope and hands-on checkpoints are maintained in that canonical future-feature plan.
+An optional future [Bluetooth Device Approval Simulator](../00_Drafts/BL-SEC-005A_Advanced_Admin_Device_and_Fraud_Risk_Feature_Plan.md#optional-learning-demo-bluetooth-device-approval-simulator) is planned near the advanced-admin UX phase. It uses real Bluetooth messages with fake approval requests, has no banking privileges and does not replace real passkeys or backend authentication. Its scope and hands-on checkpoints are maintained in that canonical future-feature plan.
 
 ## 20. MOB-005 Secure Session Storage
 

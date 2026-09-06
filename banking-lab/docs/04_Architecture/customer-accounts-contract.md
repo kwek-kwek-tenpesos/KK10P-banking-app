@@ -1,6 +1,6 @@
 # Customer Accounts and Balances Contract
 
-- Status: Implemented; database-free backend and Flutter verification passed on 2026-09-06. PostgreSQL execution, shared rollout and physical-phone verification are pending approval.
+- Status: Implemented; database-free backend, Flutter, disposable PostgreSQL, backed-up shared schema rollout and the physical customer-A journey passed on 2026-09-06. Cross-customer B isolation and TalkBack listening remain pending.
 - Scope: One explicitly opened PHP simulator account per customer, starting at PHP 0.00. Funding, transfers, ledger postings, transaction history, account closure and multiple accounts remain future work.
 - Session policy: [customer authentication contract](customer-authentication-contract.md).
 - Delivery evidence and pending manual steps: [walkthrough](../03_Walkthroughs/walkthrough-accounts-and-balances.md).
@@ -49,7 +49,7 @@ GET performs no account writes. PUT inserts a server-generated UUID, validated o
 - `CK_CustomerAccounts_Currency`: currency equals PHP.
 - `CK_CustomerAccounts_ZeroBalance`: balance equals zero.
 
-Migration `20260906042449_AddCustomerAccounts` adds this table/index/constraints only; existing identity/session tables are unchanged. It contains no seeds, backfill or automatic opening. It has been generated and reviewed, **not applied**. The new endpoints require it before rollout; app startup does not apply migrations automatically.
+Migration `20260906042449_AddCustomerAccounts` adds this table/index/constraints only; existing identity/session tables are unchanged. It contains no seeds, backfill or automatic opening. It passed the disposable `banking_lab_accounts_test` fixture and was then applied to the separately approved, backed-up shared `banking_lab` database. Shared post-checks found zero account rows and unchanged identity/session/token counts. App startup does not apply migrations automatically.
 
 Zero is the only supported monetary state because no funds have been issued. A future funding/transfer design must establish ledger authority, postings, reconciliation and concurrency before changing the zero-only constraint. An editable balance field is not a substitute for that work.
 
