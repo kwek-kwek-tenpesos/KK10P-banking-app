@@ -1,6 +1,6 @@
 # KK10P Bank Mobile Experience and UI Design Direction
 
-- Status: Canonical customer-mobile design direction; bank-restrained material matching, neutral paired lighting, blue-only accents and rapid native-button feedback are implemented. Agent normal-scale, rapid-tap and 200% device reviews passed; Chris acceptance and TalkBack remain pending.
+- Status: Canonical customer-mobile design direction. The dual-theme material proof, blue-only accents, compact paired lighting and rapid native-button feedback are implemented; Chris approved the physical Light/Dark calibration on 2026-09-08. Screen rollout and TalkBack review remain later-slice work.
 - Product: KK10P Bank educational fake-money prototype and public showcase.
 - Audience: Chris, Gio and future contributors.
 - Related implementation plan: [mobile UI foundation plan](../02_Planning/plan-kk10p-mobile-ui-foundation.md).
@@ -19,7 +19,7 @@ The Word document `BL-MOB-002_Flutter_Mobile_Architecture_and_UI_Engineering_Gui
 
 KK10P Bank should feel calm, trustworthy, tactile and clearly identifiable as a simulator. The selected direction is **accessible blue-accent neumorphism**: a pure sculpted-surface visual language with explicit accessibility safeguards.
 
-- use pale blue layered surfaces, generous rounded corners and restrained paired shadows;
+- use warm-neutral Light and charcoal Dark layered surfaces, generous rounded corners and restrained paired shadows;
 - preserve clear labels, borders, focus indicators and contrast instead of relying on shadows alone;
 - use blue for focus, selection, important actions and limited decorative emphasis;
 - use familiar Material icons consistently;
@@ -28,21 +28,23 @@ KK10P Bank should feel calm, trustworthy, tactile and clearly identifiable as a 
 
 Low-contrast, shadow-only controls are not acceptable for form fields, errors, disabled controls or critical actions. Usability and accessibility override decorative depth even though the visual language remains neumorphic.
 
-## 3. Initial Design Tokens
+## 3. Approved Material Tokens
 
-These centralized tokens define the physically calibrated pale face, blue action family and shadow strengths. Future adjustments must remain centralized.
+These centralized tokens define the physically calibrated Light/Dark faces, blue action family and shadow strengths. Future adjustments must remain centralized.
 
-| Role | Initial value | Use |
+| Role | Approved value | Use |
 | --- | --- | --- |
-| App background | `#EAF1F8` | Main page canvas |
-| Primary/control surface | `#EAF1F8` | Canvas-matched forms and ordinary raised controls |
-| Raised panel gradient | `#F3F7FB` to `#E6EEF6` | Major account and summary panels, painted above a separate shadow backing |
-| Primary blue | `#315B7D` | Navigation, focus and secondary actions |
-| Deep navy | `#172B4D` | High-emphasis text and icons |
-| Accent blue | `#3B82F6` | Icons, selection and concise emphasis on pale surfaces |
-| Primary action gradient | `#2563EB` to `#1D4ED8` | High-emphasis filled actions with white text; the lighter endpoint passes the automated 4.5:1 contrast gate |
-| Light shadow | White with controlled opacity | Top-left raised edge |
-| Dark shadow | Neutral blue-gray `#A3B1C6` with controlled opacity | Bottom-right raised edge without navy color wash |
+| Light canvas | `#ECEDE9` | Warm-neutral main page canvas |
+| Light raised face | `#F7F7F3` to `#E5E6E2` | Major surfaces, above their separate shadow backing |
+| Light inset face | `#F0F1ED` | Quiet field/selection basin; depth comes from inner lighting |
+| Light edge/highlight | `#D9FFFFFF` / `#F2FFFFFF` | Restrained hairline separation and top-left light |
+| Light contact shadow | `#809EA3A1` | Neutral lower-right depth |
+| Dark canvas | `#22262B` | Independently tuned charcoal canvas |
+| Dark raised face | `#2D333B` to `#282D34` | Dark major surfaces |
+| Dark inset face | `#2A3037` | Quiet dark field/selection basin |
+| Dark surface edge | `#80515A65` | Restrained hairline separation |
+| Light primary action | `#2563EB` to `#1E40AF` | High-emphasis filled action |
+| Dark primary action | `#60A5FA` to `#2563EB` | High-emphasis filled action tuned for the dark canvas |
 
 Use a consistent spacing rhythm based on 4 logical pixels, with common values of 8, 12, 16, 24 and 32. Interactive controls must remain at least 48 logical pixels high. Radius and shadow values belong in the shared theme rather than individual feature screens.
 
@@ -50,13 +52,13 @@ Use a consistent spacing rhythm based on 4 logical pixels, with common values of
 
 - **Base:** background with no elevation.
 - **Raised:** paired light and dark shadows for cards and selected containers.
-- **Inset:** restrained inner-style treatment for read-only metrics or selected states; never the only indicator of input focus.
+- **Inset:** restrained inner-style treatment for editable fields, selected states and pressed controls; ordinary read-only metrics stay flat unless interaction or hierarchy requires a basin.
 - **Pressed/disabled:** visible depth, color and opacity changes; button outlines are reserved for keyboard focus.
 - **Focus:** a clearly visible blue outline that does not depend on a shadow.
 - **Error:** Material error colors and text remain explicit; never represent failure only through depth or animation.
 - **Loading:** preserve progress indicators and disable duplicate actions.
 
-Current controls use paired top-left white glow and bottom-right blue-gray shadows for their resting state. Pressing a raised control swaps its outer depth for paired inner shadows. Login's Create-account and Resend-verification actions are always concave, use blue text/icons, and deepen through a darker inset gradient and stronger inner shadow while pressed. Buttons have no resting or pressed outline; keyboard focus alone adds an explicit ring. Disabled controls remove misleading raised depth and mute their content. Form fields retain Material boundaries because editable, focused and error states must remain unambiguous.
+Current controls use compact paired top-left light and bottom-right contact shadows for their resting state. Major panels, ordinary controls and icon tiles use different centralized depth strengths; raised surfaces may use a subtle hairline edge when physical separation needs it. Pressing a raised control swaps its outer depth for paired inner shadows. Login's Create-account and Resend-verification actions remain concave, use blue text/icons, and deepen their inner lighting while pressed. Decorative outlines are not added to ordinary button states; keyboard focus adds an explicit ring. Disabled controls remove misleading raised depth and mute their content. Form fields retain explicit editable, focused and error boundaries.
 
 Ordinary control faces match the pale canvas instead of using a glossy white face. Shared press feedback is 70 ms and begins from the native button's pressed state; release or gesture cancellation restores the resting shape without a forced hold. The component does not globally debounce taps. Sensitive asynchronous actions disable or reject duplicates through their controller's submitting/opening state, while safe local actions remain responsive to separate valid taps. Future transfers require server-side idempotency in their own feature plan; animation timing is not a financial safety control.
 
@@ -66,7 +68,7 @@ Decorative layers must not obscure semantic order, tap targets or state changes.
 
 The first implementation should establish only patterns already repeated by current screens:
 
-- shared light theme and design tokens;
+- shared Light/Dark material tokens;
 - soft raised/inset surface container;
 - consistent page width, safe-area and scrolling layout;
 - shared embossed native buttons, raised form-field surfaces and raised icon tiles;
@@ -124,13 +126,13 @@ Customer KYC/AML, administrator provisioning, the administrator portal, phone pa
 
 - KK10P Bank currently has no logo; keep the icon/logo slot replaceable.
 - Use the platform font initially; custom font selection is deferred.
-- Dark mode is deferred until the light design and contrast are verified.
+- App-wide Light/Dark/System selection and persistence are planned with the first-install/auth surface slice; Slice 1 established and physically approved both material palettes.
 - Illustration and 3D artwork are optional future enhancements, not prerequisites.
 - Final administrator-portal platform and its visual system require a separate decision.
 
 ## 10. Design Acceptance Boundary
 
-The corrected UI foundation now gives the existing customer screens a coherent blue-accent tactile system while retaining their tested behavior. Login follows the bank mark, `Welcome back`, individual-field, primary-action and separated-diagnostics hierarchy; Home uses a direct greeting and a stronger account card with a raised wallet tile and Refresh action. Ordinary controls now read as the same pale material as the canvas, with neutral shadows and 70 ms native-state feedback. Automated responsive, cancellation, rapid-tap, single-flight and semantics gates passed. Normal/pressed/three-rapid-tap ADB captures remained stable, physical 200% top/scrolled captures remained reachable, and the original device font scale was restored. Chris acceptance and Home/account TalkBack remain pending. This foundation does not mean the final dashboard, transfers, history, KYC or administrator experience is complete.
+The approved Slice 1 proof establishes one coherent blue-accent tactile material in Light and Dark without changing authentication, account or API behavior. Ordinary controls use compact, role-specific depth and 70 ms native-state feedback; inset treatment is reserved for editable, selected and pressed states. Automated responsive, cancellation, rapid-tap, single-flight and semantics gates passed, and the complete suite passed 131/131. Chris physically approved the final material calibration after hot-reload testing on 2026-09-08. Full auth/Home layout adoption and Home/account TalkBack listening remain later-slice work; this approval does not mean transfers, history, KYC or the administrator experience is complete.
 
 ## 11. Lighting Reference Refinement
 

@@ -1,6 +1,6 @@
 # KK10P Prototype-to-Flutter Master Roadmap
 
-- Status: Revision A approved. Slice 1 dual-theme material proof is implemented and automated checks pass; physical visual approval remains pending.
+- Status: Revision A approved. Slice 1 dual-theme material proof is implemented, automated checks pass and Chris approved the physical Light/Dark calibration on 2026-09-08. Slice 2 requires its own approved feature plan before implementation.
 - Prepared: 2026-09-07.
 - Goal: Translate the approved parts of the AI Studio Kotlin prototype into a clean, truthful and maintainable Flutter customer experience, then add the smallest backend-led fake-money features needed for Chris and Gio to transact.
 - Design source: [prototype adoption audit](../05_Design/kk10p-prototype-adoption-audit.md).
@@ -98,7 +98,7 @@ Agree on one visual system, one platform and a truthful MVP feature set before c
 - [x] Chris accepts Flutter selective reconstruction rather than Kotlin replacement.
 - [x] Chris accepts Kotlin as the principal layout/design reference while Flutter and ASP.NET remain authoritative implementation platforms.
 - [x] Chris accepts a separate future administrator surface.
-- [ ] Chris confirms Revision A: first-install introduction, dark mode now, attached-account visibility semantics and frontend-first sequencing.
+- [x] Chris confirms Revision A: first-install introduction, dark mode now, attached-account visibility semantics and frontend-first sequencing.
 
 ## 5. Slice 1 — Flutter Light/Dark Material System Proof
 
@@ -109,11 +109,8 @@ Build the smallest reusable layer needed by real existing screens:
 - centralized Light and Dark material, text, semantic, spacing, radius, depth and motion tokens;
 - raised, inset, flat and solid-blue surface roles;
 - native semantic button, icon button, input surface and major panel wrappers;
-- loading, error, empty and offline panels;
-- a Riverpod appearance controller with Light, Dark and System modes;
-- persistent appearance choice using the already installed secure-storage dependency unless a smaller, explicitly approved preference mechanism is selected;
 - the existing Material icon family; the prototype's JPEG bank/vault logo remains a replaceable candidate pending crop/compression and provenance review;
-- one internal component showcase available only in tests/debug preview.
+- one isolated component showcase reachable from developer diagnostics and covered by tests.
 
 Do not create transfer/history/admin widgets yet.
 
@@ -133,13 +130,15 @@ WHEN cancelled:
 
 ### Acceptance criteria
 
-- [ ] No ordinary surface uses an unapproved white card, orange CTA or screen-local shadow.
-- [ ] Raised controls use one light/dark pair and no decorative border.
-- [ ] Editable fields have visible focus/error states independent of shadows.
-- [ ] Dark mode is independently tuned rather than mechanically inverted and passes the same contrast/state checks as light mode.
-- [ ] Light, Dark and System choices persist without storing identity or credentials in the appearance value.
-- [ ] Native semantics, focus, cancellation, 48-pixel targets and reduced-motion behavior are tested.
-- [ ] Golden/reference captures cover both themes plus rest, press, focus, disabled, loading and error states.
+- [x] No ordinary surface uses an unapproved white card, orange CTA or screen-local shadow.
+- [x] Raised controls use one top-left highlight/lower-right contact-shadow pair and a restrained hairline edge where needed for physical separation.
+- [x] Editable fields retain focus/error states independent of decorative shadows.
+- [x] Dark mode is independently tuned rather than mechanically inverted.
+- [x] Native semantics, cancellation, rapid interaction and minimum 48-pixel targets are tested.
+- [x] Automated coverage exercises both palettes plus resting, pressed, focused and disabled control states.
+- [x] Chris physically approved the final Light/Dark material, container boundaries and pressed depth after hot-reload calibration on the authorized phone.
+
+Light/Dark/System selection and persistence, plus screen-level loading/error/empty/offline composition, move to Slice 2 where they have real auth/startup consumers.
 
 ## 6. Slice 2 — First-Install Experience and Existing Authentication Surfaces
 

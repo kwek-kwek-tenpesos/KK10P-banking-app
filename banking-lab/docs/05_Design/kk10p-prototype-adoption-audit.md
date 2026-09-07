@@ -1,6 +1,6 @@
 # KK10P Prototype Adoption Audit
 
-- Status: Flutter/ASP.NET, prototype-reference direction and corrected Revision A approved by Chris. Slice 1 dual-theme material proof is implemented pending physical visual approval.
+- Status: Flutter/ASP.NET, prototype-reference direction and corrected Revision A approved by Chris. Slice 1 dual-theme material proof and its physical Light/Dark calibration were approved on 2026-09-08.
 - Audit date: 2026-09-07.
 - Product boundary: Educational, fake-money Banking Lab—not a real bank or payment service.
 - Prototype inspected read-only: `D:\OtherProjects\Banking-UI-UX-Prototype`.
@@ -81,8 +81,10 @@ The proposed direction combines the prototype's banking composition with the mus
 
 | Role | Proposed direction |
 | --- | --- |
-| Light canvas and ordinary face | One cool pale-blue material, initially `#E8EEF6` |
-| Inset face | Slightly darker cool material, initially `#DEE6F0` |
+| Light canvas and ordinary face | Warm neutral material: `#ECEDE9` canvas with restrained `#F7F7F3` to `#E5E6E2` raised faces |
+| Light inset face | Quiet `#F0F1ED` face; inner lighting, not a strongly different fill, communicates the inset role |
+| Dark canvas and ordinary face | `#22262B` canvas with independently tuned `#2D333B` to `#282D34` raised faces |
+| Dark inset face | Quiet `#2A3037` face with compact inner lighting |
 | Main text | Deep ink/navy, initially `#0F172A` |
 | Secondary text | Slate, initially `#475569` |
 | Muted text | `#64748B`, only where contrast remains sufficient |
@@ -98,7 +100,7 @@ Exact values remain centralized Flutter tokens and may be tuned once on the phys
 
 ### Depth rules
 
-- Raised: one upper-left light plus one lower-right dark shadow; no decorative perimeter border.
+- Raised: one upper-left light plus one lower-right dark shadow and, where physical separation needs it, a restrained hairline edge from the centralized palette.
 - Pressed: transition to an inset basin immediately from the native pressed state.
 - Inset: use for editable fields and selected/pressed states; keep explicit focus and validation outlines.
 - Flat: use for ordinary copy, metadata, separators and low-priority icon actions.

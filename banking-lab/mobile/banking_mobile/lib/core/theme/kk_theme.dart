@@ -69,7 +69,7 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
     canvas: Color(0xFFECEDE9),
     surfaceStart: Color(0xFFF7F7F3),
     surfaceEnd: Color(0xFFE5E6E2),
-    insetStart: Color(0xFFD5D8D5),
+    insetStart: Color(0xFFF0F1ED),
     insetEnd: Color(0xFFF0F1ED),
     pressedStart: Color(0xFFCDD1CE),
     pressedEnd: Color(0xFFE8EAE6),
@@ -93,7 +93,7 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
         offset: Offset(-7, -7),
         blurRadius: 14,
       ),
-      BoxShadow(color: Color(0x809EA3A1), offset: Offset(7, 7), blurRadius: 14),
+      BoxShadow(color: Color(0x809EA3A1), offset: Offset(6, 6), blurRadius: 8),
     ],
     controlDepth: [
       BoxShadow(
@@ -101,15 +101,15 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
         offset: Offset(-5, -5),
         blurRadius: 10,
       ),
-      BoxShadow(color: Color(0x739EA3A1), offset: Offset(5, 5), blurRadius: 10),
+      BoxShadow(color: Color(0x739EA3A1), offset: Offset(5, 5), blurRadius: 2),
     ],
     tileDepth: [
       BoxShadow(
         color: Color(0xD9FFFFFF),
         offset: Offset(-4, -4),
-        blurRadius: 8,
+        blurRadius: 2,
       ),
-      BoxShadow(color: Color(0x669EA3A1), offset: Offset(4, 4), blurRadius: 8),
+      BoxShadow(color: Color(0x669EA3A1), offset: Offset(4, 4), blurRadius: 4),
     ],
     innerDark: Color(0xA69EA3A1),
     innerLight: Color(0xD9FFFFFF),
@@ -119,7 +119,7 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
     canvas: Color(0xFF22262B),
     surfaceStart: Color(0xFF2D333B),
     surfaceEnd: Color(0xFF282D34),
-    insetStart: Color(0xFF171A1E),
+    insetStart: Color(0xFF2A3037),
     insetEnd: Color(0xFF2A3037),
     pressedStart: Color(0xFF15181C),
     pressedEnd: Color(0xFF282E35),
@@ -231,13 +231,13 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
   List<BoxShadow> get primaryDepth => [
     BoxShadow(
       color: primaryLightShadow,
-      offset: const Offset(-5, -5),
-      blurRadius: 10,
+      offset: const Offset(-1, -1),
+      blurRadius: 5,
     ),
     BoxShadow(
       color: primaryDarkShadow,
-      offset: const Offset(5, 5),
-      blurRadius: 10,
+      offset: const Offset(2, 2),
+      blurRadius: 5,
     ),
   ];
 

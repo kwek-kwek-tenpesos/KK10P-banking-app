@@ -41,8 +41,8 @@ class KkSoftSurface extends StatelessWidget {
               borderRadius: borderRadius,
               darkColor: tokens.innerDark,
               lightColor: tokens.innerLight,
-              offset: const Offset(5, 5),
-              blurSigma: 8,
+              offset: const Offset(3, 4),
+              blurSigma: 3,
               child: Padding(padding: padding, child: child),
             )
           : Padding(padding: padding, child: child),

@@ -113,13 +113,13 @@ class _KkEmbossedButtonState extends State<KkEmbossedButton> {
         offset: insetAccent
             ? pressed
                   ? const Offset(5, 5)
-                  : const Offset(4, 4)
-            : const Offset(3, 3),
+                  : const Offset(3, 3)
+            : const Offset(4, 4),
         blurSigma: primary
-            ? 4
+            ? 2
             : insetAccent && pressed
-            ? 8
-            : 6,
+            ? 5
+            : 3,
         child: primary
             ? _buildFilledButton(tokens)
             : insetAccent

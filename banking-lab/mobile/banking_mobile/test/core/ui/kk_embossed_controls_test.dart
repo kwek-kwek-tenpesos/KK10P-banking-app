@@ -97,7 +97,7 @@ void main() {
     expect(innerShadow.visible, isTrue);
     expect(innerShadow.darkColor, KkMaterialTokens.light.primaryDarkShadow);
     expect(innerShadow.lightColor, KkMaterialTokens.light.primaryLightShadow);
-    expect(innerShadow.blurSigma, 4);
+    expect(innerShadow.blurSigma, 2);
 
     await gesture.up();
     await tester.pump(KkMotion.press);
@@ -303,7 +303,8 @@ void main() {
     expect(restingDecoration.boxShadow, isEmpty);
     expect(restingDecoration.border, isNull);
     expect(restingInnerShadow.visible, isTrue);
-    expect(restingInnerShadow.offset, const Offset(4, 4));
+    expect(restingInnerShadow.offset, const Offset(3, 3));
+    expect(restingInnerShadow.blurSigma, 3);
     expect(tester.getSize(action).height, greaterThanOrEqualTo(48));
     expect(
       tester.getSemantics(action),
@@ -328,7 +329,7 @@ void main() {
     expect(pressedDecoration.gradient, KkGradients.insetPressed);
     expect(pressedInnerShadow.visible, isTrue);
     expect(pressedInnerShadow.offset, const Offset(5, 5));
-    expect(pressedInnerShadow.blurSigma, 8);
+    expect(pressedInnerShadow.blurSigma, 5);
 
     await gesture.up();
     await tester.pumpAndSettle();

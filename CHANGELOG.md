@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-08 — Approved KK10P material baseline
+- Finalized the physically approved warm-neutral Light and charcoal Dark material tokens, compact paired depth, restrained raised-surface hairlines, blue-action press behavior and calibrated inset shadows without changing API or authentication behavior. Analysis passed and the complete Flutter suite passed 131/131; the APK rebuild was intentionally skipped at Chris's request after hot-reload device verification.
+
 ### 2026-09-07 — KK10P dual-theme material proof
 - Added independently tuned Light and Dark pure-neumorphic tokens, borderless paired top-left/bottom-right depth, true inset press lighting, and a responsive material proof reachable from API diagnostics without changing API or authentication behavior. Analysis passed, the low-contention Flutter suite passed 130/130, and the arm64 debug APK built; physical-device visual approval remains pending because no ADB device was connected.
 

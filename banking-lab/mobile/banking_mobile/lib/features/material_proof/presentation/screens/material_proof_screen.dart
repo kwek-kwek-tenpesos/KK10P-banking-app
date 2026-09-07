@@ -113,7 +113,7 @@ class _MaterialProofScreenState extends State<MaterialProofScreen> {
                               ),
                               const SizedBox(height: KkSpacing.xs),
                               Text(
-                                'PHP 12,345.67',
+                                'PHP 18,345.67',
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.w800,
                                 ),

@@ -49,12 +49,18 @@ void main() {
       expect(depth[1].offset.dy, greaterThan(0));
     }
 
-    expect(KkDepth.tile[1].blurRadius, lessThan(KkDepth.control[1].blurRadius));
+    expect({
+      KkDepth.tile[1].blurRadius,
+      KkDepth.control[1].blurRadius,
+      KkDepth.panel[1].blurRadius,
+    }, hasLength(3));
     expect(
       KkDepth.control[1].blurRadius,
       lessThan(KkDepth.panel[1].blurRadius),
     );
-    expect(KkDepth.primary[1].blurRadius, KkDepth.control[1].blurRadius);
+    expect(KkDepth.primary.first.offset, const Offset(-1, -1));
+    expect(KkDepth.primary[1].offset, const Offset(2, 2));
+    expect(KkDepth.primary[1].blurRadius, 5);
   });
 
   test('light and dark themes expose their matching material extension', () {

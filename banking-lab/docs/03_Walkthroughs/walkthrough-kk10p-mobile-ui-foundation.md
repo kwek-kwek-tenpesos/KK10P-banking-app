@@ -70,11 +70,11 @@ Flutter's ordinary box shadows are outward shadows. `KkInnerShadowPainter` clips
 - Calibration-focused core UI tests — 12/12 passed, including the raised backing/face layer regression.
 - Section 13 focused theme/control/journey tests — 20/20 passed, including blue inset rest/press/disabled states, focus-only borders and preserved registration/resend behavior.
 - Section 14 focused theme/control/controller tests — 33/33 passed, including next-frame press feedback, cancelled gesture, rapid valid taps and single-flight login/registration/account opening.
-- `flutter test --concurrency=1` — 126/126 passed after the material and rapid-interaction calibration.
+- `flutter test --concurrency=1` — 131/131 passed after the final approved Light/Dark material calibration.
 - `flutter build apk --debug` with the active runtime-only private HTTPS define — succeeded. No endpoint was saved or committed.
 - Live diagnostics — the running API returned HTTP 200 through loopback and the existing private HTTPS route.
 - The default parallel full-suite attempt exhausted Windows memory while launching test workers. It produced no assertion result and was replaced by the successful single-worker run.
-- Physical Android review — the final private-HTTPS APK installed over the existing app with data preserved. ADB captures confirmed canvas-matched ordinary controls, neutral lower-right shadows, blue role separation, primary/secondary resting and pressed states, and stability after three rapid Refresh taps with no crash lines. Physical 200% top/scrolled captures remained usable; the original 1.0 font scale was restored. Chris acceptance remains pending.
+- Physical Android review — Chris used hot reload on the authorized phone to calibrate both palettes, container hairlines, compact top-left/bottom-right depth and resting/pressed button states, then explicitly accepted the final theme on 2026-09-08. An APK rebuild was intentionally skipped for this closure at Chris's request.
 - Home/account TalkBack listening — pending by explicit agreement; pre-redesign Login listening was reported working.
 
 ## Manual Phone Checklist
