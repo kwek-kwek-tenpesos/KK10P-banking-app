@@ -1,3 +1,7 @@
+import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
+import 'package:banking_mobile/core/ui/kk_page_body.dart';
+import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/registration_controller.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/registration_state.dart';
 import 'package:flutter/material.dart';
@@ -45,15 +49,16 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Create Account')),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: state.isSuccess
-                ? _buildSuccessView(context, state)
-                : _buildFormView(context, state, theme),
-          ),
+      body: KkPageBody(
+        padding: const EdgeInsets.fromLTRB(
+          KkSpacing.lg,
+          KkSpacing.md,
+          KkSpacing.lg,
+          KkSpacing.lg,
         ),
+        child: state.isSuccess
+            ? _buildSuccessView(context, state)
+            : _buildFormView(context, state, theme),
       ),
     );
   }
@@ -61,34 +66,33 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
   Widget _buildSuccessView(BuildContext context, RegistrationState state) {
     final theme = Theme.of(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.mark_email_read_outlined,
-          size: 72,
-          color: theme.colorScheme.primary,
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Registration Submitted',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
+    return KkSoftSurface(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.mark_email_read_outlined,
+            size: 64,
+            color: theme.colorScheme.primary,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          state.successMessage ?? 'If registration can proceed, check your email for the next step.',
-          style: theme.textTheme.bodyLarge,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        Card(
-          color: theme.colorScheme.surfaceContainerHighest.withAlpha(128),
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+          const SizedBox(height: KkSpacing.lg),
+          Text(
+            'Registration Submitted',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: KkSpacing.sm),
+          Text(
+            state.successMessage ?? 'If registration can proceed, check your email for the next step.',
+            style: theme.textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: KkSpacing.md),
+          KkSoftSurface(
+            style: KkSurfaceStyle.inset,
+            padding: const EdgeInsets.all(KkSpacing.md),
             child: Row(
               children: [
                 Icon(
@@ -96,7 +100,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                   color: theme.colorScheme.primary,
                   size: 24,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: KkSpacing.sm),
                 Expanded(
                   child: Text(
                     'To protect account privacy, we do not disclose whether an email is already registered.',
@@ -106,16 +110,17 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 32),
-        FilledButton.tonal(
-          onPressed: () {
-            ref.read(registrationControllerProvider.notifier).reset();
-            context.go('/login');
-          },
-          child: const Text('Return to App'),
-        ),
-      ],
+          const SizedBox(height: KkSpacing.xl),
+          KkEmbossedButton(
+            onPressed: () {
+              ref.read(registrationControllerProvider.notifier).reset();
+              context.go('/login');
+            },
+            icon: const Icon(Icons.arrow_back),
+            label: const Text('Return to App'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -134,107 +139,115 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: KkSpacing.xs),
         Text(
           'Sign up to begin simulator banking operations.',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: KkSpacing.lg),
         if (state.generalErrorMessage != null) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: theme.colorScheme.onErrorContainer,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    state.generalErrorMessage!,
-                    style: TextStyle(color: theme.colorScheme.onErrorContainer),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        TextField(
-          controller: _emailController,
-          enabled: !state.isSubmitting,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            labelText: 'Email address',
-            prefixIcon: const Icon(Icons.email_outlined),
-            border: const OutlineInputBorder(),
-            errorText: state.fieldErrors['email'],
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _passwordController,
-          enabled: !state.isSubmitting,
-          obscureText: _obscurePassword,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            prefixIcon: const Icon(Icons.lock_outline),
-            helperText: 'Use 15–128 characters. Unicode length is checked by the server.',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+          Semantics(
+            liveRegion: true,
+            child: Container(
+              padding: const EdgeInsets.all(KkSpacing.sm),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(KkRadius.small),
               ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-            border: const OutlineInputBorder(),
-            errorText: state.fieldErrors['password'],
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _displayNameController,
-          enabled: !state.isSubmitting,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => _submit(),
-          decoration: InputDecoration(
-            labelText: 'Display name (optional)',
-            prefixIcon: const Icon(Icons.person_outline),
-            helperText: 'Max 60 characters',
-            border: const OutlineInputBorder(),
-            errorText: state.fieldErrors['displayName'],
-          ),
-        ),
-        const SizedBox(height: 24),
-        FilledButton(
-          onPressed: state.isSubmitting ? null : _submit,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: state.isSubmitting
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: theme.colorScheme.onErrorContainer,
+                  ),
+                  const SizedBox(width: KkSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      state.generalErrorMessage!,
+                      style: TextStyle(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
                     ),
-                  )
-                : const Text('Register', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
+              ),
+            ),
           ),
+          const SizedBox(height: KkSpacing.md),
+        ],
+        KkFieldSurface(
+          errorText: state.fieldErrors['email'],
+          child: TextField(
+            controller: _emailController,
+            enabled: !state.isSubmitting,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              labelText: 'Email address',
+              prefixIcon: const Icon(Icons.email_outlined),
+            ),
+          ),
+        ),
+        const SizedBox(height: KkSpacing.md),
+        KkFieldSurface(
+          helperText:
+              'Use 15–128 characters. Unicode length is checked by the server.',
+          errorText: state.fieldErrors['password'],
+          child: TextField(
+            controller: _passwordController,
+            enabled: !state.isSubmitting,
+            obscureText: _obscurePassword,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              labelText: 'Password',
+              prefixIcon: const Icon(Icons.lock_outline),
+              suffixIcon: IconButton(
+                tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: KkSpacing.md),
+        KkFieldSurface(
+          helperText: 'Max 60 characters',
+          errorText: state.fieldErrors['displayName'],
+          child: TextField(
+            controller: _displayNameController,
+            enabled: !state.isSubmitting,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(
+              labelText: 'Display name (optional)',
+              prefixIcon: const Icon(Icons.person_outline),
+            ),
+          ),
+        ),
+        const SizedBox(height: KkSpacing.lg),
+        KkEmbossedButton(
+          variant: KkEmbossedButtonVariant.primary,
+          onPressed: state.isSubmitting ? null : _submit,
+          icon: state.isSubmitting
+              ? null
+              : const Icon(Icons.person_add_outlined),
+          label: state.isSubmitting
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Register'),
         ),
       ],
     );

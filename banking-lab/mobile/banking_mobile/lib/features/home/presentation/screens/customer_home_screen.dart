@@ -1,3 +1,6 @@
+import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
+import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:banking_mobile/features/accounts/presentation/widgets/account_card.dart';
 import 'package:flutter/material.dart';
@@ -27,21 +30,27 @@ class CustomerHomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
+      body: KkPageBody(
+        maxWidth: 560,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               'Hello, $greetingName',
               style: Theme.of(context).textTheme.headlineMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+                  ?.copyWith(fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 8),
-            const Text('Your authenticated simulator session is active.'),
-            const SizedBox(height: 24),
+            const SizedBox(height: KkSpacing.xs),
+            Text(
+              'Your authenticated simulator session is active.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: KkSpacing.lg),
             if (state.isAuthenticated) const AccountCard(),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
+            const SizedBox(height: KkSpacing.lg),
+            KkEmbossedButton(
               onPressed: state.isSubmitting
                   ? null
                   : () => ref

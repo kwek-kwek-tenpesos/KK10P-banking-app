@@ -1,6 +1,6 @@
 # Customer Accounts and Balances Contract
 
-- Status: Implemented; database-free backend, Flutter, disposable PostgreSQL, backed-up shared schema rollout and the physical customer-A journey passed on 2026-09-06. Cross-customer B isolation and TalkBack listening remain pending.
+- Status: Implemented; database-free backend, Flutter, disposable PostgreSQL, backed-up shared schema rollout, physical customer-A and remote customer-B ownership journeys passed on 2026-09-06. TalkBack listening remains pending.
 - Scope: One explicitly opened PHP simulator account per customer, starting at PHP 0.00. Funding, transfers, ledger postings, transaction history, account closure and multiple accounts remain future work.
 - Session policy: [customer authentication contract](customer-authentication-contract.md).
 - Delivery evidence and pending manual steps: [walkthrough](../03_Walkthroughs/walkthrough-accounts-and-balances.md).

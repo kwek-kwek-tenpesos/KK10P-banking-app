@@ -1,5 +1,6 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/storage/secure_session_store.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:banking_mobile/features/authentication/data/models/registration_request.dart';
 import 'package:banking_mobile/features/authentication/data/models/registration_response.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
@@ -21,7 +22,10 @@ void main() {
         overrides: [
           authenticationRepositoryProvider.overrideWithValue(fakeRepository),
         ],
-        child: const MaterialApp(home: RegistrationScreen()),
+        child: MaterialApp(
+          theme: KkTheme.light(),
+          home: const RegistrationScreen(),
+        ),
       );
     }
 
@@ -57,12 +61,14 @@ void main() {
 
       final initialField = tester.widget<TextField>(passwordFieldFinder);
       expect(initialField.obscureText, isTrue);
+      expect(find.byTooltip('Show password'), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.visibility_outlined));
       await tester.pumpAndSettle();
 
       final toggledField = tester.widget<TextField>(passwordFieldFinder);
       expect(toggledField.obscureText, isFalse);
+      expect(find.byTooltip('Hide password'), findsOneWidget);
     });
 
     testWidgets('submits form and displays success confirmation view', (
@@ -128,6 +134,26 @@ void main() {
         findsOneWidget,
       );
     });
+
+    for (final width in [320.0, 360.0, 412.0, 768.0]) {
+      testWidgets('remains scrollable at width $width and 200% text', (
+        tester,
+      ) async {
+        tester.view.physicalSize = Size(width, 1200);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = 2;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.ensureVisible(find.text('Register'));
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('Register'), findsOneWidget);
+      });
+    }
   });
 }
 

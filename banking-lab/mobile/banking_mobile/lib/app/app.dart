@@ -1,4 +1,5 @@
 import 'package:banking_mobile/app/app_router.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,15 +11,9 @@ class BankingLabApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'KK10P Bank',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF315B7D),
-          secondary: const Color(0xFFFF8A4C),
-          surface: const Color(0xFFF4F8FC),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFEAF1F8),
-        useMaterial3: true,
-      ),
+      theme: KkTheme.light(),
+      darkTheme: KkTheme.dark(),
+      themeMode: ThemeMode.light,
       routerConfig: ref.watch(appRouterProvider),
     );
   }

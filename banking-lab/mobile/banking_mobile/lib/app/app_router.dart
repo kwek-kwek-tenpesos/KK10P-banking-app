@@ -1,8 +1,11 @@
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/email_verification_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/login_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/registration_screen.dart';
 import 'package:banking_mobile/features/home/presentation/screens/customer_home_screen.dart';
+import 'package:banking_mobile/features/material_proof/presentation/screens/material_proof_screen.dart';
 import 'package:banking_mobile/features/system_info/presentation/screens/system_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +31,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final mayOpenDuringRestore =
             location == '/' ||
             location == '/verify-email' ||
-            location == '/diagnostics';
+            location == '/diagnostics' ||
+            location == '/material-proof';
         return mayOpenDuringRestore ? null : '/';
       }
       if (location == '/') return auth.isAuthenticated ? '/home' : '/login';
@@ -58,6 +62,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/home',
         builder: (context, state) => const CustomerHomeScreen(),
       ),
+      GoRoute(
+        path: '/material-proof',
+        builder: (context, state) => const MaterialProofScreen(),
+      ),
     ],
   );
   ref.onDispose(router.dispose);
@@ -69,6 +77,37 @@ class _StartupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: KkSoftSurface(
+            padding: EdgeInsets.all(KkSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.account_balance_rounded,
+                  size: 52,
+                  color: KkColors.primary,
+                ),
+                SizedBox(height: KkSpacing.md),
+                Text(
+                  'KK10P Bank',
+                  style: TextStyle(
+                    color: KkColors.navy,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: KkSpacing.lg),
+                CircularProgressIndicator(
+                  semanticsLabel: 'Restoring your secure session',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

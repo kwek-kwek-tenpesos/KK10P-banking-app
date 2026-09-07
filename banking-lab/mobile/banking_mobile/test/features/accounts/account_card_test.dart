@@ -1,4 +1,5 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
 import 'package:banking_mobile/features/accounts/presentation/widgets/account_card.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ void main() {
                 ),
               ],
               child: MaterialApp(
+                theme: KkTheme.light(),
                 home: MediaQuery(
                   data: MediaQueryData(
                     size: Size(width, 1200),

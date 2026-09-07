@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/storage/secure_session_store.dart';
 import 'package:banking_mobile/features/authentication/data/models/registration_request.dart';
@@ -173,6 +175,33 @@ void main() {
       expect(repository.lastRequest?.displayName, 'Chris');
     });
 
+    test('rapid repeated registration remains single flight', () async {
+      final gate = Completer<RegistrationResponse>();
+      repository.onRegister = (_) => gate.future;
+
+      final first = controller.register(
+        email: 'customer@example.test',
+        password: 'Correct Horse Battery Staple!',
+      );
+      final duplicate = controller.register(
+        email: 'customer@example.test',
+        password: 'Correct Horse Battery Staple!',
+      );
+
+      expect(await duplicate, isFalse);
+      expect(repository.calls, 1);
+      expect(controller.state.status, RegistrationStatus.submitting);
+
+      gate.complete(
+        const RegistrationResponse(
+          outcome: 0,
+          message: 'Registration accepted.',
+        ),
+      );
+      expect(await first, isTrue);
+      expect(repository.calls, 1);
+    });
+
     test('maps ValidationFailure to field errors and message', () async {
       repository.error = const ValidationFailure(
         'Validation failed.',
@@ -231,10 +260,15 @@ final class _MockAuthenticationRepository extends AuthenticationRepository {
   RegistrationResponse? response;
   Object? error;
   RegistrationRequest? lastRequest;
+  Future<RegistrationResponse> Function(RegistrationRequest)? onRegister;
+  int calls = 0;
 
   @override
   Future<RegistrationResponse> register(RegistrationRequest request) async {
+    calls++;
     lastRequest = request;
+    final handler = onRegister;
+    if (handler != null) return handler(request);
     if (error != null) {
       throw error!;
     }

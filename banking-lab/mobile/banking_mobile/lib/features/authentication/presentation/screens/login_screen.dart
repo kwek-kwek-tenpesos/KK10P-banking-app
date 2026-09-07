@@ -1,4 +1,7 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
+import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:flutter/material.dart';
@@ -39,145 +42,149 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
 
     if (state.status == AuthenticationStatus.initializing) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            semanticsLabel: 'Restoring your secure session',
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: Card(
-                elevation: 0,
-                color: theme.colorScheme.surface.withAlpha(230),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Icon(
-                        Icons.account_balance_rounded,
-                        size: 56,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'KK10P Bank',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Sign in to your fake-money banking account.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      if (state.errorMessage != null) ...[
-                        const SizedBox(height: 20),
-                        _ErrorBanner(message: state.errorMessage!),
-                      ],
-                      const SizedBox(height: 24),
-                      TextField(
-                        controller: _emailController,
-                        enabled: !state.isSubmitting,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.username],
-                        decoration: const InputDecoration(
-                          labelText: 'Email address',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _passwordController,
-                        enabled: !state.isSubmitting,
-                        obscureText: _obscurePassword,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        textInputAction: TextInputAction.done,
-                        autofillHints: const [AutofillHints.password],
-                        onSubmitted: (_) => _submit(),
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      FilledButton(
-                        onPressed: state.isSubmitting ? null : _submit,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: state.isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('Sign in'),
-                        ),
-                      ),
-                      if (state.canRetryRestore) ...[
-                        const SizedBox(height: 8),
-                        OutlinedButton(
-                          onPressed: state.isSubmitting
-                              ? null
-                              : () => ref
-                                    .read(
-                                      authenticationControllerProvider.notifier,
-                                    )
-                                    .initialize(),
-                          child: const Text('Retry saved session'),
-                        ),
-                      ],
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: state.isSubmitting
-                            ? null
-                            : () => context.push('/register'),
-                        child: const Text('Create a customer account'),
-                      ),
-                      TextButton(
-                        onPressed: state.isSubmitting
-                            ? null
-                            : () => showDialog<void>(
-                                context: context,
-                                builder: (context) =>
-                                    const _ResendVerificationDialog(),
-                              ),
-                        child: const Text('Resend verification email'),
-                      ),
-                      TextButton.icon(
-                        onPressed: () => context.push('/diagnostics'),
-                        icon: const Icon(Icons.monitor_heart_outlined),
-                        label: const Text('Open API diagnostics'),
-                      ),
-                    ],
+      body: KkPageBody(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Align(
+              child: KkIconTile(icon: Icons.account_balance_rounded, size: 48),
+            ),
+            const SizedBox(height: KkSpacing.md),
+            Text(
+              'KK10P Bank',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: KkSpacing.xl),
+            Text(
+              'Welcome back',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: KkSpacing.xs),
+            Text(
+              'Sign in to your fake-money simulator account.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            if (state.errorMessage != null) ...[
+              const SizedBox(height: KkSpacing.lg),
+              _ErrorBanner(message: state.errorMessage!),
+            ],
+            const SizedBox(height: KkSpacing.lg),
+            KkFieldSurface(
+              child: TextField(
+                controller: _emailController,
+                enabled: !state.isSubmitting,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.username],
+                decoration: const InputDecoration(
+                  labelText: 'Email address',
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
+              ),
+            ),
+            const SizedBox(height: KkSpacing.md),
+            KkFieldSurface(
+              child: TextField(
+                controller: _passwordController,
+                enabled: !state.isSubmitting,
+                obscureText: _obscurePassword,
+                enableSuggestions: false,
+                autocorrect: false,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.password],
+                onSubmitted: (_) => _submit(),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    tooltip: _obscurePassword
+                        ? 'Show password'
+                        : 'Hide password',
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: KkSpacing.lg),
+            KkEmbossedButton(
+              variant: KkEmbossedButtonVariant.primary,
+              onPressed: state.isSubmitting ? null : _submit,
+              icon: state.isSubmitting ? null : const Icon(Icons.login),
+              label: state.isSubmitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Sign in'),
+            ),
+            if (state.canRetryRestore) ...[
+              const SizedBox(height: KkSpacing.md),
+              KkEmbossedButton(
+                onPressed: state.isSubmitting
+                    ? null
+                    : () => ref
+                          .read(authenticationControllerProvider.notifier)
+                          .initialize(),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry saved session'),
+              ),
+            ],
+            const SizedBox(height: KkSpacing.md),
+            KkEmbossedButton(
+              variant: KkEmbossedButtonVariant.insetAccent,
+              onPressed: state.isSubmitting
+                  ? null
+                  : () => context.push('/register'),
+              icon: const Icon(Icons.person_add_outlined),
+              label: const Text('Create a customer account'),
+            ),
+            const SizedBox(height: KkSpacing.sm),
+            KkEmbossedButton(
+              variant: KkEmbossedButtonVariant.insetAccent,
+              onPressed: state.isSubmitting
+                  ? null
+                  : () => showDialog<void>(
+                      context: context,
+                      builder: (context) => const _ResendVerificationDialog(),
+                    ),
+              icon: const Icon(Icons.email_outlined),
+              label: const Text('Resend verification email'),
+            ),
+            const SizedBox(height: KkSpacing.xs),
+            const Divider(),
+            const SizedBox(height: KkSpacing.md),
+            KkEmbossedButton(
+              onPressed: () => context.push('/diagnostics'),
+              icon: const Icon(Icons.monitor_heart_outlined),
+              label: const Text('Open API diagnostics'),
+            ),
+          ],
         ),
       ),
     );
@@ -192,13 +199,16 @@ class _ErrorBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colors.errorContainer,
-        borderRadius: BorderRadius.circular(12),
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colors.errorContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(message, style: TextStyle(color: colors.onErrorContainer)),
       ),
-      child: Text(message, style: TextStyle(color: colors.onErrorContainer)),
     );
   }
 }

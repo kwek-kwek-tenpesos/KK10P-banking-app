@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-07 — KK10P dual-theme material proof
+- Added independently tuned Light and Dark pure-neumorphic tokens, borderless paired top-left/bottom-right depth, true inset press lighting, and a responsive material proof reachable from API diagnostics without changing API or authentication behavior. Analysis passed, the low-contention Flutter suite passed 130/130, and the arm64 debug APK built; physical-device visual approval remains pending because no ADB device was connected.
+
+### 2026-09-07 — KK10P bank-restrained material and rapid interaction
+- Matched ordinary control faces to the pale canvas, replaced navy-derived depth with the neutral `#A3B1C6` shadow family, separated vivid pale-surface accents from contrast-safe filled blues, and centralized native raised/inset feedback at 70 ms. Added cancellation, rapid-tap and single-flight login/registration coverage without a global debounce or copied Kotlin code. Analysis passed, focused checks passed 33/33, the low-memory suite passed 126/126, and the private-HTTPS APK built/installed with data preserved; normal, pressed, rapid-tap and 200% ADB reviews passed with no crash lines and font restoration confirmed, while Chris acceptance and TalkBack remain pending.
+
+### 2026-09-07 — KK10P exaggerated blue neumorphic depth
+- Strengthened centralized tile/control/panel lighting with a visible top-left white halo and bottom-right shadow, removed normal/pressed button outlines while preserving focus rings, and replaced the former orange family with accessible blue tokens. Login's support actions now use one reusable always-concave native-button variant with deeper pressed and muted disabled states while preserving behavior. Analysis passed, focused checks passed 20/20, the low-memory suite passed 121/121, and the private-HTTPS APK built/installed with data preserved; normal and 200% ADB reviews passed with font restoration confirmed, while Chris acceptance and TalkBack remain pending.
+
+### 2026-09-07 — KK10P physical color and depth calibration
+- Calibrated the shared pale gradients, orange action grade and pressed-shadow opacity from real Android captures. Raised panels now isolate their outer shadow on a backing layer so the physical renderer cannot wash the opaque face blue-gray. Added a layer-isolation regression test; analysis, 12 focused core UI tests and the complete low-memory suite passed 118/118. The private-HTTPS APK was installed over the existing phone app with data preserved, and normal-scale resting/pressed captures passed agent review; Chris's acceptance, 200% visual review and Home/account TalkBack remain pending.
+
+### 2026-09-07 — KK10P true-inset lighting refinement
+- Added centralized tile/control/panel lighting levels, reusable surface gradients and a native clipped inner-shadow painter so pressed controls become concave without a UI dependency. Moved registration helper/errors outside raised field bodies and aligned Sign out with tactile secondary actions while preserving behavior. Analysis, 39 focused tests and the complete low-memory suite passed 117/117; the private-HTTPS APK built, with physical normal/large-text and TalkBack acceptance pending.
+
+### 2026-09-07 — KK10P tactile visual-fidelity correction
+- Reworked Login and Home hierarchy and added shared embossed native buttons, raised field surfaces, icon tiles, pressed/focused/disabled depth states and dark status-bar icons without changing routes, controllers or API behavior. Analysis, 34 focused tests and the complete low-memory Flutter suite passed 112/112; the corrected APK built, while physical normal/large-text comparison and Home/account TalkBack remain pending.
+
+### 2026-09-07 — KK10P mobile UI foundation
+- Applied a centralized accessible hybrid-neumorphic Flutter theme and reusable page/surface components to startup, authentication, email verification, diagnostics, Home and account states without changing routes or API behavior. Added spoken password-toggle labels and responsive foundation tests; analysis passed, the low-memory full suite passed 102/102 and the private-HTTPS debug APK built. Physical Android visual and Home/account TalkBack review remain pending.
+
+### 2026-09-06 — Remote customer-B ownership verification
+- Verified Gio's remote Android registration and confirmation through the shared private HTTPS API and loopback Mailpit without remote ADB. User-provided screenshots showed Gio's unopened state without Chris's reference and then a distinct PHP 0.00 account; PostgreSQL confirmed exactly two accounts with two unique owners. TalkBack listening remains pending.
+
 ### 2026-09-06 — Physical customer-account verification (customer A)
 - Installed the current debug APK in place on the Infinix device and verified private Tailscale HTTPS diagnostics, local Mailpit registration/confirmation, authenticated unopened state, explicit PHP 0.00 account opening, PostgreSQL persistence, force-stop restoration, recoverable API-outage Retry, 200% text/scroll reachability and server-backed logout. Cross-customer B isolation and TalkBack listening remain pending; no data was reset or deleted and no ZAP scan ran.
 

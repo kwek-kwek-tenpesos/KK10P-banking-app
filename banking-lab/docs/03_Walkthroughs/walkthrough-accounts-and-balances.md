@@ -1,7 +1,7 @@
 # Customer Accounts and Balances Delivery
 
 - Date: 2026-09-06.
-- Status: Code, database-free checks, disposable PostgreSQL verification, backed-up shared schema rollout and the physical customer-A journey are complete. Cross-customer B isolation and TalkBack listening remain pending.
+- Status: Code, database-free checks, disposable PostgreSQL verification, backed-up shared schema rollout, physical customer-A and remote customer-B ownership journeys are complete. TalkBack listening remains pending.
 - Approved behavior: One PHP simulator account per customer, opened explicitly at PHP 0.00; funding/transfers separate.
 - Canonical behavior: [accounts contract](../04_Architecture/customer-accounts-contract.md).
 - Current execution and approvals: [task.md](../01_Tracking/task.md).
@@ -54,7 +54,7 @@
 | Flutter analysis | No issues found. |
 | Account-card widget states | Unopened/loaded/error at 320, 360, 412 and 768 logical-pixel widths, with 200% text scaling; no overflow. Button size and focus/tap semantics checked. |
 | Migration generation and SQL script generation | Succeeded and was reviewed before the later approved rollout. Forward SQL creates CustomerAccounts, its constraints and unique index, then records the migration in EF history. |
-| Physical customer-A path | In-place APK update preserved app data; private HTTPS diagnostics, Mailpit registration/confirmation, login, unopened state, opening, persistence, API-outage Retry and logout passed. |
+| Physical customer-A and remote customer-B paths | Chris passed in-place APK diagnostics, registration/confirmation, login, unopened state, opening, persistence, API-outage Retry and logout. Gio's screenshots plus PostgreSQL proved a separate owner/account. |
 | Physical accessibility sample | At 200% system text, the long reference wrapped and Refresh/Sign out remained reachable by scrolling; the original 1.0 scale was restored. TalkBack spoken order remains pending. |
 | Targeted whitespace and documentation checks | Completed at handoff; see task.md for final status. |
 
@@ -98,12 +98,16 @@ Force-stop/relaunch restored both the authenticated session and the exact accoun
 
 Server-backed sign-out reached Login. A second force-stop/relaunch stayed at Login with no stale account reference. PostgreSQL then showed 4 historical session rows and 10 historical refresh-token rows but 0 active sessions/tokens; the single account remained intact at zero balance. Historical rows are retained security evidence, not active logins.
 
+Gio then installed the pushed build and connected remotely through the same private Tailscale HTTPS endpoint. The raw Tailscale IPv4/HTTP form did not work because the API remains intentionally loopback-only; a fresh `flutter run` with the HTTPS Serve hostname was required because `API_BASE_URL` is a compile-time value. The host detected exactly one new Mailpit message above the two-message baseline, validated its custom-link target/parameters and confirmed it through the HTTPS API with HTTP 204 without printing the token. At that point the database held 4 confirmed users but still only Chris's account.
+
+Gio's first screenshot showed his display name and the explicit unopened card, with no account reference from Chris. His second screenshot showed PHP 0.00 and a different simulator reference after Open account. PostgreSQL independently confirmed exactly 2 accounts, 2 unique owners, all PHP/zero values and Gio's displayed reference. This closes the cross-customer ownership-isolation observation without remote ADB; the UI evidence came from Gio while the API/database evidence came from the host.
+
 ### Remaining physical checks
 
-- Cross-customer B isolation still needs either an additional approved fake-customer write or another known test credential entered locally. Automated repository tests already cover late account work across logout/login generations, but that does not replace the physical A/B observation.
 - TalkBack spoken reading order requires Chris to listen on the device. XML/semantics inspection and widget focus tests cannot truthfully substitute for that human check.
 - A deliberately delayed in-flight request was not injected into the shared runtime. The widget suite covers logout while an account request is pending; physical testing covered ordinary server-backed logout, restart isolation and the separate outage/Retry state.
+- `app_config.dart` still uses old HTTP/LAN examples in configuration-error copy. The working remote flow uses the private HTTPS Serve hostname; correct those examples in a separately reviewed code change so future testers are not misled.
 
 ## Focused security review
 
-Reviewed the new account endpoints/query filters, request guards, minimal DTOs, migrations, mobile token handling, redirect policy, error paths and session/storage races. No unresolved high/critical finding was identified within this source-review scope. That is not a full repository audit or a ZAP result. The material remaining physical gaps are cross-customer B isolation and TalkBack listening; do not label those checks passed until observed.
+Reviewed the new account endpoints/query filters, request guards, minimal DTOs, migrations, mobile token handling, redirect policy, error paths and session/storage races. No unresolved high/critical finding was identified within this source-review scope. That is not a full repository audit or a ZAP result. TalkBack listening remains the only unobserved physical check.

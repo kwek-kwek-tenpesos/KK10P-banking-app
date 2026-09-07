@@ -1,4 +1,8 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
+import 'package:banking_mobile/core/ui/kk_page_body.dart';
+import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,79 +63,77 @@ class _EmailVerificationScreenState
 
     return Scaffold(
       appBar: AppBar(title: const Text('Verify email')),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: Card(
-                elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _confirmed
-                            ? Icons.verified_outlined
-                            : Icons.mark_email_unread_outlined,
-                        size: 64,
-                        color: _confirmed
-                            ? Colors.green
-                            : theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _confirmed
-                            ? 'Email verified'
-                            : invalidLink
-                            ? 'Invalid verification link'
-                            : 'Confirm your email address',
-                        style: theme.textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _confirmed
-                            ? 'Your account can now sign in.'
-                            : invalidLink
-                            ? 'Request a new verification message from the sign-in screen.'
-                            : 'Tap confirm to submit this one-use verification token securely.',
-                        textAlign: TextAlign.center,
-                      ),
-                      if (_errorMessage != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          _errorMessage!,
-                          style: TextStyle(color: theme.colorScheme.error),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      if (!_confirmed && !invalidLink)
-                        FilledButton(
-                          onPressed: _submitting ? null : _confirm,
-                          child: _submitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('Confirm email'),
-                        ),
-                      if (_confirmed || invalidLink)
-                        FilledButton(
-                          onPressed: () => context.go('/login'),
-                          child: const Text('Go to sign in'),
-                        ),
-                    ],
+      body: KkPageBody(
+        child: KkSoftSurface(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                _confirmed
+                    ? Icons.verified_outlined
+                    : Icons.mark_email_unread_outlined,
+                size: 64,
+                color: _confirmed
+                    ? const Color(0xFF2E7D32)
+                    : theme.colorScheme.primary,
+              ),
+              const SizedBox(height: KkSpacing.lg),
+              Text(
+                _confirmed
+                    ? 'Email verified'
+                    : invalidLink
+                    ? 'Invalid verification link'
+                    : 'Confirm your email address',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: KkSpacing.sm),
+              Text(
+                _confirmed
+                    ? 'Your account can now sign in.'
+                    : invalidLink
+                    ? 'Request a new verification message from the sign-in screen.'
+                    : 'Tap confirm to submit this one-use verification token securely.',
+                textAlign: TextAlign.center,
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: KkSpacing.md),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: theme.colorScheme.error),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-            ),
+              ],
+              const SizedBox(height: KkSpacing.lg),
+              if (!_confirmed && !invalidLink)
+                KkEmbossedButton(
+                  variant: KkEmbossedButtonVariant.primary,
+                  onPressed: _submitting ? null : _confirm,
+                  icon: _submitting
+                      ? null
+                      : const Icon(Icons.verified_outlined),
+                  label: _submitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Confirm email'),
+                ),
+              if (_confirmed || invalidLink)
+                KkEmbossedButton(
+                  variant: KkEmbossedButtonVariant.primary,
+                  onPressed: () => context.go('/login'),
+                  icon: const Icon(Icons.login),
+                  label: const Text('Go to sign in'),
+                ),
+            ],
           ),
         ),
       ),

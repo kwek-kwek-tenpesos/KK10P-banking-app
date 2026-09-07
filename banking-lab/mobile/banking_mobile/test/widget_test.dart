@@ -33,13 +33,58 @@ void main() {
       'KK10P Bank',
     );
     expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byTooltip('Show password'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Open API diagnostics'));
     await tester.tap(find.text('Open API diagnostics'));
     await tester.pumpAndSettle();
 
     expect(find.text('Banking API'), findsOneWidget);
     expect(find.text('Version: v1.0.0'), findsOneWidget);
     expect(find.text('Environment: Test'), findsOneWidget);
+  });
+
+  testWidgets('login actions remain reachable at 320 width and 200% text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 1000);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(
+      _testApp(store: _MemorySessionStore(), api: _FakeAuthenticationApi()),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome back'), findsOneWidget);
+    await tester.ensureVisible(find.text('Open API diagnostics'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('inset login actions preserve registration and resend flows', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _testApp(store: _MemorySessionStore(), api: _FakeAuthenticationApi()),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Create a customer account'));
+    await tester.tap(find.text('Create a customer account'));
+    await tester.pumpAndSettle();
+    expect(find.text('Join KK10P Bank'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Resend verification email'));
+    await tester.tap(find.text('Resend verification email'));
+    await tester.pumpAndSettle();
+    expect(find.text('Resend verification'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Send'), findsOneWidget);
   });
 
   testWidgets('customer can sign in, enter protected home, and sign out', (
