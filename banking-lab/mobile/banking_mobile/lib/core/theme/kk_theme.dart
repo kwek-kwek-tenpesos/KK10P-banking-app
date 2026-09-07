@@ -4,16 +4,16 @@ import 'package:flutter/services.dart';
 /// Legacy light-palette aliases kept while existing screens move to the
 /// theme-aware material tokens one slice at a time.
 abstract final class KkColors {
-  static const background = Color(0xFFE8EEF6);
+  static const background = Color(0xFFECEDE9);
   static const surface = background;
-  static const raisedSurface = Color(0xFFE3EAF3);
+  static const raisedSurface = Color(0xFFE5E6E2);
   static const primary = Color(0xFF2563EB);
   static const navy = Color(0xFF0F172A);
   static const accent = primary;
   static const action = primary;
   static const actionShade = Color(0xFF1E40AF);
   static const lightShadow = Color(0xFFFFFFFF);
-  static const darkShadow = Color(0xFF9BAABC);
+  static const darkShadow = Color(0xFF9EA3A1);
 }
 
 abstract final class KkMotion {
@@ -50,7 +50,12 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
     required this.textSecondary,
     required this.primary,
     required this.primaryShade,
+    required this.primaryPressedStart,
+    required this.primaryPressedEnd,
+    required this.primaryLightShadow,
+    required this.primaryDarkShadow,
     required this.onPrimary,
+    required this.surfaceBorder,
     required this.lightShadow,
     required this.darkShadow,
     required this.panelDepth,
@@ -61,101 +66,103 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
   });
 
   static const light = KkMaterialTokens(
-    canvas: Color(0xFFE8EEF6),
-    surfaceStart: Color(0xFFF1F5FA),
-    surfaceEnd: Color(0xFFE1E9F2),
-    insetStart: Color(0xFFD3DDE8),
-    insetEnd: Color(0xFFEDF2F8),
-    pressedStart: Color(0xFFCBD6E2),
-    pressedEnd: Color(0xFFE4EBF3),
-    disabledStart: Color(0xFFE0E7EF),
-    disabledEnd: Color(0xFFD5DEE8),
+    canvas: Color(0xFFECEDE9),
+    surfaceStart: Color(0xFFF7F7F3),
+    surfaceEnd: Color(0xFFE5E6E2),
+    insetStart: Color(0xFFD5D8D5),
+    insetEnd: Color(0xFFF0F1ED),
+    pressedStart: Color(0xFFCDD1CE),
+    pressedEnd: Color(0xFFE8EAE6),
+    disabledStart: Color(0xFFE1E3DF),
+    disabledEnd: Color(0xFFD7DAD6),
     textPrimary: Color(0xFF0F172A),
     textSecondary: Color(0xFF475569),
     primary: Color(0xFF2563EB),
     primaryShade: Color(0xFF1E40AF),
     onPrimary: Colors.white,
+    primaryPressedStart: Color(0xFF1D4EB8),
+    primaryPressedEnd: Color(0xFF3979F2),
+    primaryLightShadow: Color(0x805B8FF5),
+    primaryDarkShadow: Color(0x70173889),
+    surfaceBorder: Color(0xD9FFFFFF),
     lightShadow: Color(0xF2FFFFFF),
-    darkShadow: Color(0xB39BAABC),
+    darkShadow: Color(0x809EA3A1),
     panelDepth: [
       BoxShadow(
         color: Color(0xF2FFFFFF),
-        offset: Offset(-10, -10),
-        blurRadius: 22,
+        offset: Offset(-7, -7),
+        blurRadius: 14,
       ),
-      BoxShadow(
-        color: Color(0xB39BAABC),
-        offset: Offset(10, 10),
-        blurRadius: 22,
-      ),
+      BoxShadow(color: Color(0x809EA3A1), offset: Offset(7, 7), blurRadius: 14),
     ],
     controlDepth: [
       BoxShadow(
-        color: Color(0xF2FFFFFF),
-        offset: Offset(-7, -7),
-        blurRadius: 15,
+        color: Color(0xE6FFFFFF),
+        offset: Offset(-5, -5),
+        blurRadius: 10,
       ),
-      BoxShadow(color: Color(0xB39BAABC), offset: Offset(7, 7), blurRadius: 15),
+      BoxShadow(color: Color(0x739EA3A1), offset: Offset(5, 5), blurRadius: 10),
     ],
     tileDepth: [
       BoxShadow(
-        color: Color(0xF2FFFFFF),
-        offset: Offset(-5, -5),
-        blurRadius: 11,
+        color: Color(0xD9FFFFFF),
+        offset: Offset(-4, -4),
+        blurRadius: 8,
       ),
-      BoxShadow(color: Color(0xA69BAABC), offset: Offset(5, 5), blurRadius: 11),
+      BoxShadow(color: Color(0x669EA3A1), offset: Offset(4, 4), blurRadius: 8),
     ],
-    innerDark: Color(0xB39BAABC),
-    innerLight: Color(0xE6FFFFFF),
+    innerDark: Color(0xA69EA3A1),
+    innerLight: Color(0xD9FFFFFF),
   );
 
   static const dark = KkMaterialTokens(
-    canvas: Color(0xFF202833),
-    surfaceStart: Color(0xFF293440),
-    surfaceEnd: Color(0xFF1C242E),
-    insetStart: Color(0xFF151B22),
-    insetEnd: Color(0xFF26313D),
-    pressedStart: Color(0xFF11171E),
-    pressedEnd: Color(0xFF222C37),
-    disabledStart: Color(0xFF232D38),
-    disabledEnd: Color(0xFF1B232C),
+    canvas: Color(0xFF22262B),
+    surfaceStart: Color(0xFF2D333B),
+    surfaceEnd: Color(0xFF282D34),
+    insetStart: Color(0xFF171A1E),
+    insetEnd: Color(0xFF2A3037),
+    pressedStart: Color(0xFF15181C),
+    pressedEnd: Color(0xFF282E35),
+    disabledStart: Color(0xFF292E35),
+    disabledEnd: Color(0xFF22272D),
     textPrimary: Color(0xFFF1F5F9),
     textSecondary: Color(0xFFCBD5E1),
     primary: Color(0xFF60A5FA),
     primaryShade: Color(0xFF2563EB),
+    primaryPressedStart: Color(0xFF2B64B7),
+    primaryPressedEnd: Color(0xFF5A9AEF),
+    primaryLightShadow: Color(0x70578FDD),
+    primaryDarkShadow: Color(0x80142445),
     onPrimary: Color(0xFF07111F),
-    lightShadow: Color(0xB33A4858),
-    darkShadow: Color(0xD911171E),
+    surfaceBorder: Color(0x80515A65),
+    lightShadow: Color(0x4D56606B),
+    darkShadow: Color(0x990E1115),
     panelDepth: [
       BoxShadow(
-        color: Color(0xB33A4858),
-        offset: Offset(-10, -10),
-        blurRadius: 22,
+        color: Color(0x4D56606B),
+        offset: Offset(-6, -6),
+        blurRadius: 12,
       ),
-      BoxShadow(
-        color: Color(0xD911171E),
-        offset: Offset(10, 10),
-        blurRadius: 22,
-      ),
+      BoxShadow(color: Color(0x990E1115), offset: Offset(6, 6), blurRadius: 12),
     ],
     controlDepth: [
       BoxShadow(
-        color: Color(0xA63A4858),
-        offset: Offset(-7, -7),
-        blurRadius: 15,
+        color: Color(0x4056606B),
+        offset: Offset(-4, -4),
+        blurRadius: 8,
       ),
-      BoxShadow(color: Color(0xD911171E), offset: Offset(7, 7), blurRadius: 15),
+      BoxShadow(color: Color(0x8C0E1115), offset: Offset(4, 4), blurRadius: 8),
     ],
     tileDepth: [
       BoxShadow(
-        color: Color(0x993A4858),
-        offset: Offset(-5, -5),
-        blurRadius: 11,
+        color: Color(0x3856606B),
+        offset: Offset(-3, -3),
+        blurRadius: 6,
       ),
-      BoxShadow(color: Color(0xCC11171E), offset: Offset(5, 5), blurRadius: 11),
+      BoxShadow(color: Color(0x800E1115), offset: Offset(3, 3), blurRadius: 6),
     ],
-    innerDark: Color(0xE611171E),
-    innerLight: Color(0x993A4858),
+    innerDark: Color(0xBF0F1216),
+    innerLight: Color(0x66545E69),
   );
 
   final Color canvas;
@@ -171,7 +178,12 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
   final Color textSecondary;
   final Color primary;
   final Color primaryShade;
+  final Color primaryPressedStart;
+  final Color primaryPressedEnd;
+  final Color primaryLightShadow;
+  final Color primaryDarkShadow;
   final Color onPrimary;
+  final Color surfaceBorder;
   final Color lightShadow;
   final Color darkShadow;
   final List<BoxShadow> panelDepth;
@@ -210,6 +222,25 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
     colors: [primary, primaryShade],
   );
 
+  LinearGradient get primaryPressedGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primaryPressedStart, primaryPressedEnd],
+  );
+
+  List<BoxShadow> get primaryDepth => [
+    BoxShadow(
+      color: primaryLightShadow,
+      offset: const Offset(-5, -5),
+      blurRadius: 10,
+    ),
+    BoxShadow(
+      color: primaryDarkShadow,
+      offset: const Offset(5, 5),
+      blurRadius: 10,
+    ),
+  ];
+
   static KkMaterialTokens of(BuildContext context) {
     return Theme.of(context).extension<KkMaterialTokens>() ?? light;
   }
@@ -229,7 +260,12 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
     Color? textSecondary,
     Color? primary,
     Color? primaryShade,
+    Color? primaryPressedStart,
+    Color? primaryPressedEnd,
+    Color? primaryLightShadow,
+    Color? primaryDarkShadow,
     Color? onPrimary,
+    Color? surfaceBorder,
     Color? lightShadow,
     Color? darkShadow,
     List<BoxShadow>? panelDepth,
@@ -252,7 +288,12 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
       textSecondary: textSecondary ?? this.textSecondary,
       primary: primary ?? this.primary,
       primaryShade: primaryShade ?? this.primaryShade,
+      primaryPressedStart: primaryPressedStart ?? this.primaryPressedStart,
+      primaryPressedEnd: primaryPressedEnd ?? this.primaryPressedEnd,
+      primaryLightShadow: primaryLightShadow ?? this.primaryLightShadow,
+      primaryDarkShadow: primaryDarkShadow ?? this.primaryDarkShadow,
       onPrimary: onPrimary ?? this.onPrimary,
+      surfaceBorder: surfaceBorder ?? this.surfaceBorder,
       lightShadow: lightShadow ?? this.lightShadow,
       darkShadow: darkShadow ?? this.darkShadow,
       panelDepth: panelDepth ?? this.panelDepth,
@@ -283,7 +324,28 @@ class KkMaterialTokens extends ThemeExtension<KkMaterialTokens> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       primary: Color.lerp(primary, other.primary, t)!,
       primaryShade: Color.lerp(primaryShade, other.primaryShade, t)!,
+      primaryPressedStart: Color.lerp(
+        primaryPressedStart,
+        other.primaryPressedStart,
+        t,
+      )!,
+      primaryPressedEnd: Color.lerp(
+        primaryPressedEnd,
+        other.primaryPressedEnd,
+        t,
+      )!,
+      primaryLightShadow: Color.lerp(
+        primaryLightShadow,
+        other.primaryLightShadow,
+        t,
+      )!,
+      primaryDarkShadow: Color.lerp(
+        primaryDarkShadow,
+        other.primaryDarkShadow,
+        t,
+      )!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
+      surfaceBorder: Color.lerp(surfaceBorder, other.surfaceBorder, t)!,
       lightShadow: Color.lerp(lightShadow, other.lightShadow, t)!,
       darkShadow: Color.lerp(darkShadow, other.darkShadow, t)!,
       panelDepth: BoxShadow.lerpList(panelDepth, other.panelDepth, t)!,
@@ -300,6 +362,7 @@ abstract final class KkDepth {
   static final panel = KkMaterialTokens.light.panelDepth;
   static final control = KkMaterialTokens.light.controlDepth;
   static final tile = KkMaterialTokens.light.tileDepth;
+  static final primary = KkMaterialTokens.light.primaryDepth;
   static final raised = panel;
 }
 
@@ -309,6 +372,7 @@ abstract final class KkGradients {
   static final insetControl = KkMaterialTokens.light.insetGradient;
   static final insetPressed = KkMaterialTokens.light.pressedGradient;
   static final primaryAction = KkMaterialTokens.light.primaryGradient;
+  static final primaryPressed = KkMaterialTokens.light.primaryPressedGradient;
   static final disabledControl = KkMaterialTokens.light.disabledGradient;
   static const disabledAction = LinearGradient(
     begin: Alignment.topLeft,

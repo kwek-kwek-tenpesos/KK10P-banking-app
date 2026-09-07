@@ -72,7 +72,9 @@ class _KkEmbossedButtonState extends State<KkEmbossedButton> {
       decoration: BoxDecoration(
         gradient: primary
             ? enabled
-                  ? tokens.primaryGradient
+                  ? pressed
+                        ? tokens.primaryPressedGradient
+                        : tokens.primaryGradient
                   : tokens.disabledGradient
             : insetAccent
             ? enabled
@@ -86,21 +88,23 @@ class _KkEmbossedButtonState extends State<KkEmbossedButton> {
         borderRadius: BorderRadius.circular(KkRadius.small),
         border: focused ? Border.all(color: focusColor, width: 2) : null,
         boxShadow: enabled && !pressed && !insetAccent
-            ? tokens.controlDepth
+            ? primary
+                  ? tokens.primaryDepth
+                  : tokens.controlDepth
             : const [],
       ),
       child: KkInnerShadow(
         visible: enabled && (pressed || insetAccent),
         borderRadius: KkRadius.small,
         darkColor: primary
-            ? tokens.darkShadow.withAlpha(90)
+            ? tokens.primaryDarkShadow
             : insetAccent
             ? pressed
                   ? tokens.innerDark.withAlpha(235)
                   : tokens.innerDark
             : tokens.innerDark,
         lightColor: primary
-            ? tokens.lightShadow.withAlpha(80)
+            ? tokens.primaryLightShadow
             : insetAccent
             ? pressed
                   ? tokens.innerLight.withAlpha(235)
@@ -111,7 +115,11 @@ class _KkEmbossedButtonState extends State<KkEmbossedButton> {
                   ? const Offset(5, 5)
                   : const Offset(4, 4)
             : const Offset(3, 3),
-        blurSigma: insetAccent && pressed ? 8 : 6,
+        blurSigma: primary
+            ? 4
+            : insetAccent && pressed
+            ? 8
+            : 6,
         child: primary
             ? _buildFilledButton(tokens)
             : insetAccent
@@ -142,7 +150,7 @@ class _KkEmbossedButtonState extends State<KkEmbossedButton> {
     overlayColor: WidgetStateProperty.resolveWith((states) {
       if (states.contains(WidgetState.pressed)) {
         return widget.variant == KkEmbossedButtonVariant.primary
-            ? const Color(0x0A000000)
+            ? tokens.primary.withAlpha(8)
             : widget.variant == KkEmbossedButtonVariant.insetAccent
             ? tokens.primary.withAlpha(12)
             : tokens.primary.withAlpha(10);

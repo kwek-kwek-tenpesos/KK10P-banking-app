@@ -31,6 +31,9 @@ class KkSoftSurface extends StatelessWidget {
           KkSurfaceStyle.flat => null,
         },
         borderRadius: radius,
+        border: style == KkSurfaceStyle.raised
+            ? Border.all(color: tokens.surfaceBorder, width: 0.75)
+            : null,
       ),
       child: style == KkSurfaceStyle.inset
           ? KkInnerShadow(

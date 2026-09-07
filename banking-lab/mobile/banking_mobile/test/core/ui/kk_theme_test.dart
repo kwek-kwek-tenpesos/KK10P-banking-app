@@ -7,13 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('light material and accent tokens keep bank-safe contrast', () {
     expect(KkColors.surface, KkColors.background);
-    expect(KkColors.background, const Color(0xFFE8EEF6));
-    expect(KkColors.darkShadow, const Color(0xFF9BAABC));
+    expect(KkColors.background, const Color(0xFFECEDE9));
+    expect(KkColors.darkShadow, const Color(0xFF9EA3A1));
     expect(KkColors.accent, const Color(0xFF2563EB));
     expect(KkColors.action, const Color(0xFF2563EB));
     expect(KkGradients.control.colors, const [
-      Color(0xFFF1F5FA),
-      Color(0xFFE1E9F2),
+      Color(0xFFF7F7F3),
+      Color(0xFFE5E6E2),
     ]);
 
     final whiteTextContrast =
@@ -25,9 +25,14 @@ void main() {
 
   test('dark material is independently tuned and keeps action contrast', () {
     const tokens = KkMaterialTokens.dark;
-    expect(tokens.canvas, const Color(0xFF202833));
+    expect(tokens.canvas, const Color(0xFF22262B));
     expect(tokens.surfaceStart, isNot(tokens.canvas));
     expect(tokens.primary, const Color(0xFF60A5FA));
+    expect(tokens.lightShadow.a, lessThan(0.5));
+    expect(tokens.primaryDepth.first.color, tokens.primaryLightShadow);
+    expect(tokens.primaryDepth.last.color, tokens.primaryDarkShadow);
+    expect(tokens.surfaceBorder.a, greaterThan(0));
+    expect(tokens.panelDepth.last.blurRadius, 12);
 
     final actionContrast =
         (tokens.primary.computeLuminance() + 0.05) /
@@ -49,6 +54,7 @@ void main() {
       KkDepth.control[1].blurRadius,
       lessThan(KkDepth.panel[1].blurRadius),
     );
+    expect(KkDepth.primary[1].blurRadius, KkDepth.control[1].blurRadius);
   });
 
   test('light and dark themes expose their matching material extension', () {
@@ -95,7 +101,15 @@ void main() {
       contains(
         isA<BoxDecoration>()
             .having((value) => value.gradient, 'gradient', KkGradients.panel)
-            .having((value) => value.boxShadow, 'shadow', isNull),
+            .having((value) => value.boxShadow, 'shadow', isNull)
+            .having(
+              (value) => value.border?.top,
+              'hairline border',
+              BorderSide(
+                color: KkMaterialTokens.light.surfaceBorder,
+                width: 0.75,
+              ),
+            ),
       ),
     );
   });

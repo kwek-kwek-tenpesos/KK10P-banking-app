@@ -45,6 +45,7 @@ void main() {
                 .decoration!
             as BoxDecoration;
     expect(decoration.gradient, KkGradients.primaryAction);
+    expect(decoration.boxShadow, KkDepth.primary);
     expect(tester.getSize(button).height, greaterThanOrEqualTo(48));
     expect(
       tester.getSemantics(button),
@@ -62,6 +63,44 @@ void main() {
     await tester.tap(button);
     expect(taps, 1);
     semantics.dispose();
+  });
+
+  testWidgets('pressed primary stays blue with blue-tinted inner depth', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        KkEmbossedButton(
+          variant: KkEmbossedButtonVariant.primary,
+          onPressed: () {},
+          label: const Text('Primary action'),
+        ),
+      ),
+    );
+
+    final animated = find.descendant(
+      of: find.byType(KkEmbossedButton),
+      matching: find.byType(AnimatedContainer),
+    );
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Primary action')),
+    );
+    await tester.pump();
+
+    final decoration =
+        tester.widget<AnimatedContainer>(animated).decoration! as BoxDecoration;
+    final innerShadow = tester.widget<KkInnerShadow>(
+      find.byType(KkInnerShadow),
+    );
+    expect(decoration.gradient, KkGradients.primaryPressed);
+    expect(decoration.boxShadow, isEmpty);
+    expect(innerShadow.visible, isTrue);
+    expect(innerShadow.darkColor, KkMaterialTokens.light.primaryDarkShadow);
+    expect(innerShadow.lightColor, KkMaterialTokens.light.primaryLightShadow);
+    expect(innerShadow.blurSigma, 4);
+
+    await gesture.up();
+    await tester.pump(KkMotion.press);
   });
 
   testWidgets(
