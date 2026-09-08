@@ -1,6 +1,6 @@
 # KK10P Bank Mobile Experience and UI Design Direction
 
-- Status: Canonical customer-mobile design direction. The dual-theme material and Slice 2 first-install/authentication surfaces are physically approved. Home rollout and Home/account TalkBack review remain later-slice work.
+- Status: Canonical customer-mobile design direction. The dual-theme material, Slice 2 first-install/authentication surfaces, and Slice 3 Home/account Light/Dark/TalkBack behavior are physically approved. Slice 3's optional unopened-customer phone path was not run and remains automated-covered.
 - Product: KK10P Bank educational fake-money prototype and public showcase.
 - Audience: Chris, Gio and future contributors.
 - Related implementation plan: [mobile UI foundation plan](../02_Planning/plan-kk10p-mobile-ui-foundation.md).
@@ -98,8 +98,8 @@ Startup and session restoration
 | Login | Email/password form with separated support/info actions | Implemented with existing validation and controller behavior |
 | Registration | Email, password and optional display name | Implemented with the same contract and improved hierarchy |
 | Email confirmation | One-use link confirmation screen | Implemented with clearer state presentation and no token rendering |
-| Home | Greeting, account card, diagnostics and sign-out | Foundation for a future account dashboard |
-| Account | Unopened/loading/loaded/error states in Home | Preserve all states; improve hierarchy without inventing funds |
+| Home | Clean greeting, simulator disclosure, one account hero, diagnostics and sign-out | Implemented without unsupported prototype modules or inactive navigation |
+| Account | Loading/unopened/opening/reconciliation/unconfirmed/loaded/error states in Home | Implemented with flat balance presentation, local privacy toggle and no invented funds |
 | Transfer | Not implemented | Future planned multi-step flow; no placeholder action yet |
 | Activity | Not implemented | Future paginated history and receipt/details |
 | Profile/settings | Not implemented | Add only with a separate behavior plan |
@@ -133,7 +133,7 @@ Customer KYC/AML, administrator provisioning, the administrator portal, phone pa
 
 ## 10. Design Acceptance Boundary
 
-The approved Slice 1 proof establishes one coherent blue-accent tactile material in Light and Dark without changing authentication, account or API behavior. Ordinary controls use compact, role-specific depth and 70 ms native-state feedback; inset treatment is reserved for editable, selected and pressed states. Chris physically approved the material calibration and Slice 2 first-install/authentication surfaces after hot-reload testing on 2026-09-08. The complete Flutter suite passed 149/149. Home layout adoption, Home/account TalkBack, transfers, history, KYC, local biometric/device-credential app lock and the administrator experience remain later work.
+The approved Slice 1 proof establishes one coherent blue-accent tactile material in Light and Dark without changing authentication, account or API behavior. Ordinary controls use compact, role-specific depth and 70 ms native-state feedback; inset treatment is reserved for editable, selected and pressed states. Chris physically approved the material calibration and Slice 2 first-install/authentication surfaces after hot-reload testing on 2026-09-08. Slice 3 applies that material to the clean one-account Home, uses a flat read-only balance, and exposes only API-backed actions. The complete Flutter suite passed 170/170, and Chris physically accepted its Light/Dark and TalkBack behavior. The optional unopened-customer phone path was not run and remains automated-covered. Transfers, history, KYC, local biometric/device-credential app lock and the administrator experience remain later work.
 
 ## 11. Lighting Reference Refinement
 

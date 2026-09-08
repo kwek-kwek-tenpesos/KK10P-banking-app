@@ -47,6 +47,32 @@ class CustomerHomeScreen extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
+            const SizedBox(height: KkSpacing.md),
+            Semantics(
+              container: true,
+              label: 'Educational fake-money simulator. No real funds or payment services.',
+              child: ExcludeSemantics(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: KkSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        'Educational fake-money simulator. No real funds or payment services.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: KkSpacing.lg),
             if (state.isAuthenticated) const AccountCard(),
             const SizedBox(height: KkSpacing.lg),

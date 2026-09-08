@@ -16,7 +16,12 @@ namespace Banking.IntegrationTests;
 // normalizer and hasher still run. This does not simulate PostgreSQL constraints.
 internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
 {
-    public RegistrationTestHost() => ClientOptions.BaseAddress = new Uri("https://localhost");
+    private readonly string environment;
+    public RegistrationTestHost(string environment = "Testing")
+    {
+        this.environment = environment;
+        ClientOptions.BaseAddress = new Uri("https://localhost");
+    }
     public bool FailDatabaseWrites { get; set; }
     public RegistrationTestStore Store { get; } = new();
     public RecordingVerificationDelivery Delivery { get; } = new();
@@ -24,7 +29,7 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(environment);
         builder.UseTestAuthentication();
         builder.ConfigureAppConfiguration((_, configuration) =>
             configuration.AddInMemoryCollection(new Dictionary<string, string?>

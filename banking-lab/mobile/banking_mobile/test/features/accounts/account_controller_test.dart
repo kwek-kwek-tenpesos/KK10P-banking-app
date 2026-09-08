@@ -26,21 +26,70 @@ void main() {
     expect(controller.state.account, sampleAccount);
   });
 
-  test('uncertain opening reconciles GET before repeating PUT', () async {
+  test('rapid balance refreshes share the active read', () async {
+    final repo = StubAccountsRepository()..onRead = () async => sampleAccount;
+    final controller = AccountController(repo, () => true, () async {});
+    addTearDown(controller.dispose);
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.state.status, AccountStatus.loaded);
+
+    final gate = Completer<AccountSummary?>();
+    repo.onRead = () => gate.future;
+    final first = controller.load();
+    await controller.load();
+    expect(controller.state.status, AccountStatus.loading);
+    expect(repo.reads, 2);
+
+    gate.complete(sampleAccount);
+    await first;
+    expect(controller.state.status, AccountStatus.loaded);
+    expect(repo.reads, 2);
+  });
+
+  test('uncertain opening is distinct and reconciles GET before PUT', () async {
     final repo = StubAccountsRepository()
       ..onOpen = () async => throw const TimeoutFailure();
     final controller = AccountController(repo, () => true, () async {});
     addTearDown(controller.dispose);
     await Future<void>.delayed(Duration.zero);
     await controller.open();
-    expect(controller.state.status, AccountStatus.error);
-    expect(controller.state.message, contains('unconfirmed'));
-    repo.onRead = () async => sampleAccount;
-    await controller.retry();
+    expect(controller.state.status, AccountStatus.openingUnconfirmed);
+    expect(controller.state.message, isNotEmpty);
+
+    final gate = Completer<AccountSummary?>();
+    repo.onRead = () => gate.future;
+    final retry = controller.retry();
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.state.status, AccountStatus.reconcilingOpen);
+    expect(repo.opens, 1);
+    expect(repo.reads, 2);
+
+    gate.complete(sampleAccount);
+    await retry;
     expect(controller.state.status, AccountStatus.loaded);
     expect(repo.opens, 1);
     expect(repo.reads, 2);
   });
+
+  test(
+    'reconciliation repeats idempotent PUT only after GET finds none',
+    () async {
+      final repo = StubAccountsRepository()
+        ..onOpen = () async => throw const TimeoutFailure();
+      final controller = AccountController(repo, () => true, () async {});
+      addTearDown(controller.dispose);
+      await Future<void>.delayed(Duration.zero);
+      await controller.open();
+
+      repo.onRead = () async => null;
+      repo.onOpen = () async => sampleAccount;
+      await controller.retry();
+
+      expect(controller.state.status, AccountStatus.loaded);
+      expect(repo.reads, 2);
+      expect(repo.opens, 2);
+    },
+  );
 
   test(
     'outages preserve retry state; definitive 401 invalidates session',

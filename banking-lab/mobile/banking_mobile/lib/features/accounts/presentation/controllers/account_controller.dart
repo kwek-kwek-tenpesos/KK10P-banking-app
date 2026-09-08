@@ -8,7 +8,15 @@ import 'package:banking_mobile/features/authentication/data/repositories/authent
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum AccountStatus { loading, unopened, opening, loaded, error }
+enum AccountStatus {
+  loading,
+  unopened,
+  opening,
+  reconcilingOpen,
+  openingUnconfirmed,
+  loaded,
+  error,
+}
 
 class AccountState {
   const AccountState(this.status, {this.account, this.message});
@@ -16,7 +24,9 @@ class AccountState {
   final AccountSummary? account;
   final String? message;
   bool get busy =>
-      status == AccountStatus.loading || status == AccountStatus.opening;
+      status == AccountStatus.loading ||
+      status == AccountStatus.opening ||
+      status == AccountStatus.reconcilingOpen;
 }
 
 class AccountController extends StateNotifier<AccountState> {
@@ -28,7 +38,6 @@ class AccountController extends StateNotifier<AccountState> {
   final bool Function() _isCurrent;
   final Future<void> Function() _invalidate;
   bool _pending = false;
-  bool _openingUncertain = false;
 
   Future<void> load() => _run(open: false);
   Future<void> open() async {
@@ -36,20 +45,27 @@ class AccountController extends StateNotifier<AccountState> {
     await _run(open: true);
   }
 
-  Future<void> retry() =>
-      _run(open: _openingUncertain, reconcile: _openingUncertain);
+  Future<void> retry() {
+    final reconcile = state.status == AccountStatus.openingUnconfirmed;
+    return _run(open: reconcile, reconcile: reconcile);
+  }
 
   Future<void> _run({required bool open, bool reconcile = false}) async {
     if (_pending || !mounted || !_isCurrent()) return;
     _pending = true;
-    state = AccountState(open ? AccountStatus.opening : AccountStatus.loading);
+    state = AccountState(
+      reconcile
+          ? AccountStatus.reconcilingOpen
+          : open
+          ? AccountStatus.opening
+          : AccountStatus.loading,
+    );
     try {
       AccountSummary? result;
       if (reconcile) result = await _repository.read();
       if (!mounted || !_isCurrent()) return;
       result ??= open ? await _repository.open() : await _repository.read();
       if (!mounted || !_isCurrent()) return;
-      _openingUncertain = false;
       state = AccountState(
         result == null ? AccountStatus.unopened : AccountStatus.loaded,
         account: result,
@@ -59,12 +75,9 @@ class AccountController extends StateNotifier<AccountState> {
     } catch (error) {
       if (!mounted || !_isCurrent()) return;
       final failure = mapApiError(error);
-      _openingUncertain = open;
       state = AccountState(
-        AccountStatus.error,
-        message: open
-            ? '${failure.message} Account opening is unconfirmed. Retry to check its status.'
-            : failure.message,
+        open ? AccountStatus.openingUnconfirmed : AccountStatus.error,
+        message: failure.message,
       );
     } finally {
       _pending = false;

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-09 — KK10P ledger and Development funding candidate
+- Added an append-only balanced PHP journal, atomic non-negative account snapshots, and a Development-only fixed PHP 50,000 self-grant capped at PHP 100,000 per account per Philippine day. Added UUID idempotency, account-row serialization, bounded/rate-limited secure input, a confirmation-gated authenticated Diagnostics action, migration/architecture documentation, and concurrency/security coverage. Verification passed 211 ordinary backend tests, 4/4 fresh disposable PostgreSQL ledger tests, clean Flutter analysis, and 177/177 Flutter tests. After explicit approval and verified backup, only the reviewed migration was applied to shared `banking_lab`. Two separately confirmed grants reconciled to PHP 100,000 with four zero-sum postings; the resulting non-zero response exposed and prompted a fix for Flutter's stale zero-only account parser.
+
+### 2026-09-08 — KK10P clean Home and current-account foundation
+- Rebuilt authenticated Home around one truthful API-backed PHP simulator account, with a compact simulator disclosure, flat balance presentation, local balance privacy control, responsive UUID reference, and distinct loading/opening/reconciliation/unconfirmed/error states. Preserved diagnostics, sign-out, request single-flight, session invalidation, and stale-result guards without backend, database, API contract, dependency, or material-token changes. Flutter analysis passed and the complete serialized suite passed 170/170; Chris physically accepted Light/Dark and TalkBack behavior. The optional unopened-customer phone path was not run and remains automated-covered.
+
 ### 2026-09-08 — KK10P first-install and authentication surfaces
 - Added a truthful first-install Welcome/reusable About experience, persistent Light/Dark/System appearance, coordinated preference/session startup, a non-authorizing known-account presentation hint and prototype-inspired auth/diagnostics composition. Removed the Flutter preview gallery; physical review now uses normal hot reload. No backend, database or API contract changed. Analysis passed, the complete Flutter suite passed 149/149, and Chris accepted every physical Light/Dark Slice 2 checklist item on 2026-09-08.
 

@@ -71,14 +71,20 @@ public sealed class PostgresAccountTests(PostgresAccountsHost host)
     }
 
     [AccountsPostgresFact]
-    public async Task DatabaseRejectsInvalidCurrencyNonzeroAndOrphanAccounts()
+    public async Task DatabaseAllowsCreditsButRejectsInvalidCurrencyNegativeAndOrphanAccounts()
     {
         var user = await CustomerSessionTests.SeedAsync(host.Services);
+        using (var scope = host.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.CustomerAccounts.Add(new CustomerAccount { UserId = user.Id, BalanceMinor = 1 });
+            await db.SaveChangesAsync();
+        }
+        var other = await CustomerSessionTests.SeedAsync(host.Services);
         foreach (var invalid in new[]
         {
-            new CustomerAccount { UserId = user.Id, Currency = "USD" },
-            new CustomerAccount { UserId = user.Id, BalanceMinor = 1 },
-            new CustomerAccount { UserId = user.Id, BalanceMinor = -1 },
+            new CustomerAccount { UserId = other.Id, Currency = "USD" },
+            new CustomerAccount { UserId = other.Id, BalanceMinor = -1 },
             new CustomerAccount { UserId = Guid.NewGuid().ToString() }
         })
         {
@@ -87,7 +93,7 @@ public sealed class PostgresAccountTests(PostgresAccountsHost host)
             db.CustomerAccounts.Add(invalid);
             var exception = await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
             var postgres = Assert.IsType<PostgresException>(exception.InnerException);
-            Assert.Equal(invalid.UserId == user.Id ? PostgresErrorCodes.CheckViolation : PostgresErrorCodes.ForeignKeyViolation,
+            Assert.Equal(invalid.UserId == other.Id ? PostgresErrorCodes.CheckViolation : PostgresErrorCodes.ForeignKeyViolation,
                 postgres.SqlState);
         }
     }

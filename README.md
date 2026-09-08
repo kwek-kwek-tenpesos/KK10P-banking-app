@@ -17,7 +17,9 @@ Authentication progress: registration, verification/resend, login, refresh/logou
 
 The [accounts/balances implementation](banking-lab/docs/03_Walkthroughs/walkthrough-accounts-and-balances.md) adds owner-only GET/idempotent PUT `/api/v1/accounts/me`, explicit opening at PHP 0.00, a persisted zero-only account model and Home account states with session-safe retries. On 2026-09-06, 196 database-free backend tests and 101 Flutter tests passed with clean analysis; the four account PostgreSQL tests then passed against a fresh disposable target. After a verified custom-format backup, only the additive account migration was applied successfully to shared `banking_lab`. Chris's physical customer-A path and Gio's remote customer-B ownership-isolation path passed; TalkBack listening remains pending. Use the [accounts contract](banking-lab/docs/04_Architecture/customer-accounts-contract.md) for current behavior.
 
-The customer screens now use the approved accessible blue-accent neumorphic KK10P foundation. Slice 2 adds a truthful first-install Welcome/reusable About screen, persistent Light/Dark/System appearance, coordinated preference/session startup and recomposed Login, Registration, Verification and Diagnostics. Versioned local experience flags contain no identity or credentials and never authorize protected routes. The Flutter preview gallery was removed in favor of normal physical-device hot reload. On 2026-09-08, analysis passed and all 149 serialized Flutter tests passed, including responsive 320/360/412/768-width and 200% text coverage; Chris then accepted every physical Light/Dark Slice 2 checklist item. Home/account TalkBack listening remains pending. The canonical [KK10P mobile design direction](banking-lab/docs/05_Design/kk10p-mobile-ui-design-system.md), [Slice 2 plan](banking-lab/docs/02_Planning/plan-kk10p-slice-2-first-install-auth-surfaces.md) and [Slice 2 walkthrough](banking-lab/docs/03_Walkthroughs/walkthrough-kk10p-slice-2-first-install-auth-surfaces.md) describe the current boundary. Original flowcharts and Word files in `docs/00_Drafts/` are reference ideas, not current behavior contracts.
+The customer screens now use the approved accessible blue-accent neumorphic KK10P foundation. Slice 2 adds a truthful first-install Welcome/reusable About screen, persistent Light/Dark/System appearance, coordinated preference/session startup and recomposed Login, Registration, Verification and Diagnostics. Slice 3 adds a clean authenticated Home containing one truthful API-backed PHP simulator account, flat balance presentation, local balance privacy, explicit opening/reconciliation/error states and no unsupported prototype banking controls. Versioned local experience flags contain no identity or credentials and never authorize protected routes. The Flutter preview gallery was removed in favor of normal physical-device hot reload. Slice 2 and Slice 3 Light/Dark/TalkBack behavior are physically accepted; Slice 3's optional unopened-customer phone path was not run and remains automated-covered.
+
+Slice 4 now implements an append-only balanced PHP journal, a fixed Development-only PHP 50,000 self-funding operation with a PHP 100,000 Philippine-day cap, UUID idempotency, serialized concurrency, and a small authenticated Diagnostics trigger. On 2026-09-09, 211 ordinary backend tests, all 4 fresh disposable PostgreSQL ledger tests, clean Flutter analysis, and all 177 Flutter tests passed. After explicit approval and a verified custom-format backup, only the reviewed ledger migration was applied to shared Development `banking_lab`. The first tester then separately confirmed two valid grants, reaching PHP 100,000 with 2 transactions and 4 balanced postings; the other account remains zero. A stale Flutter zero-only parser exposed by that test was corrected and reverified, with physical Home refresh still pending. Use the canonical [KK10P mobile design direction](banking-lab/docs/05_Design/kk10p-mobile-ui-design-system.md), [Slice 4 contract](banking-lab/docs/04_Architecture/ledger-development-funding-contract.md), and [Slice 4 walkthrough](banking-lab/docs/03_Walkthroughs/walkthrough-kk10p-slice-4-ledger-development-funding.md) for the current boundary. Original flowcharts and Word files in `docs/00_Drafts/` are reference ideas, not current behavior contracts.
 
 [Batch C and follow-up review](banking-lab/docs/03_Walkthroughs/walkthrough-authentication-repair-batch-c.md) corrected an expiry-during-persistence exception and hardened the scanner wrapper. `pwsh -NoProfile -File banking-lab/scripts/run-zap-scan.ps1` is now a no-network/no-write preview; `pwsh -NoProfile -File banking-lab/scripts/test-zap-scan.ps1` runs offline guard checks. Actual scanning/downloads need separate approval. Initial scan coverage is diagnostic GET only, not authentication. Generated SDK and raw ZAP folders are ignored but not deleted.
 
@@ -53,8 +55,8 @@ Not implemented yet:
 
 - Verified HTTPS Android App Links for a future public release; the current custom scheme is prototype-only
 - Authentication recovery, verified App Links and operational security controls
-- Funding/nonzero balances; account code is implemented but migration rollout and real-database/device verification remain pending
-- Transfers and ledger rules
+- Physical-device confirmation that the corrected Home parser renders the reconciled PHP 100,000 balance
+- Internal transfers and transfer-specific ledger rules
 - Transaction history
 - Production deployment
 - Production HTTPS and security hardening
@@ -66,7 +68,7 @@ Not implemented yet:
 Android phone
 Flutter mobile application
         |
-        | HTTPS requests and JSON responses through Tailscale Serve (phone auth)
+        | HTTPS requests and JSON responses through the current Tailscale Serve tunnel
         v
 ASP.NET Core backend API
         |
@@ -78,6 +80,8 @@ PostgreSQL 17 database
 The Flutter application is treated as an untrusted client. It must not connect directly to PostgreSQL or make authoritative balance changes.
 
 Future banking operations must pass through ASP.NET Core, where authentication, authorization, validation, transactions, idempotency, audit logging, and ledger rules can be enforced.
+
+Cloudflare Tunnel is a deferred infrastructure candidate, not current behavior. A later plan will compare it with Tailscale Serve across origin trust, Access/DNS, secrets, observability, failure handling, and rollback before any tunnel change.
 
 ## Current End-to-End Flow
 
@@ -702,9 +706,10 @@ The project currently has:
 
 - Customer authentication is verified end to end locally and on the physical Android phone; production email and verified App Links remain future work
 - The custom `kk10pbank` URI scheme must become a verified HTTPS App Link before public authentication use
-- Owner-only account endpoints and a zero-balance PHP account model are implemented; account migration rollout is pending
-- No funding, nonzero balances, transfers, transaction history or ledger
-- Four guarded account PostgreSQL tests are authored but not executed; six existing session PostgreSQL tests were skipped in this database-free delivery
+- Owner-only account endpoints and the non-negative ledger-backed shared schema are deployed
+- Development funding and balanced ledger code are implemented, migrated, and reconciled after two authenticated grants; corrected non-zero Home rendering awaits physical confirmation
+- No internal transfers or customer transaction-history screen
+- Four guarded ledger PostgreSQL tests passed on a fresh disposable target; other opt-in PostgreSQL suites are not part of every ordinary run
 - Backend validation and ProblemDetails exist, but error handling and security controls still need the documented repairs
 - No production database environment
 - No production HTTPS configuration

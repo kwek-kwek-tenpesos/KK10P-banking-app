@@ -1,6 +1,6 @@
 # Slice 3 Plan: Current Account and Clean Home Foundation
 
-- Status: Draft for Chris's approval. No Slice 3 implementation is authorized yet.
+- Status: Accepted on 2026-09-08. Automated verification passed 170/170; Chris physically accepted Light/Dark and TalkBack behavior. The optional unopened-customer phone path was not run and remains automated-covered.
 - Prepared: 2026-09-08.
 - Parent roadmap: [KK10P prototype-to-Flutter roadmap](plan-kk10p-prototype-to-flutter-roadmap.md).
 - Visual sources: [approved mobile design system](../05_Design/kk10p-mobile-ui-design-system.md), [prototype adoption audit](../05_Design/kk10p-prototype-adoption-audit.md), and the Kotlin prototype inspected read-only.
@@ -316,4 +316,4 @@ The Slice 3 walkthrough remains proportional to the delivered change but will in
 
 ## 16. Approval Gate
 
-Implementation starts only after Chris explicitly approves this Slice 3 plan. Approval authorizes only the files and behavior described above; it does not authorize deferred security, backend, database, money-movement, Activity, administrator, git commit, or push work.
+Chris approved this plan on 2026-09-08. Approval authorizes only the files and behavior described above; it does not authorize deferred security, backend, database, money-movement, Activity, administrator, git commit, or push work.

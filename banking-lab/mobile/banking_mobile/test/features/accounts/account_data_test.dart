@@ -14,18 +14,30 @@ import 'account_test_support.dart';
 void main() {
   test('balance parsing and formatting use integer minor units', () {
     expect(sampleAccount.formattedBalance, 'PHP 0.00');
-    final exact = AccountSummary(
-      id: sampleAccount.id,
-      currency: 'PHP',
-      balanceMinor: BigInt.parse('9007199254740993'),
-      openedAtUtc: sampleAccount.openedAtUtc,
+    expect(
+      AccountSummary.fromJson({...accountJson, 'balanceMinor': '5000000'})
+          .formattedBalance,
+      'PHP 50,000.00',
     );
-    expect(exact.formattedBalance, 'PHP 90071992547409.93');
+    expect(
+      AccountSummary.fromJson({...accountJson, 'balanceMinor': '10000000'})
+          .formattedBalance,
+      'PHP 100,000.00',
+    );
+    expect(
+      AccountSummary.fromJson({
+        ...accountJson,
+        'balanceMinor': '9223372036854775807',
+      }).formattedBalance,
+      'PHP 92,233,720,368,547,758.07',
+    );
     for (final invalid in <Map<String, dynamic>>[
       {'balanceMinor': 0},
       {'balanceMinor': '0.00'},
-      {'balanceMinor': '1'},
       {'balanceMinor': '-1'},
+      {'balanceMinor': '+1'},
+      {'balanceMinor': '01'},
+      {'balanceMinor': '9223372036854775808'},
       {'currency': 'USD'},
       {'id': 'bad'},
       {'openedAtUtc': 'bad'},

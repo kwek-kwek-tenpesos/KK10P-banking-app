@@ -69,3 +69,20 @@ final class SessionStorageFailure extends AppFailure {
   const SessionStorageFailure()
     : super('Secure session storage is unavailable. Please sign in again.');
 }
+
+final class DevelopmentAccountRequiredFailure extends AppFailure {
+  const DevelopmentAccountRequiredFailure()
+    : super('Open your simulator account before adding test funds.');
+}
+
+final class DevelopmentFundingLimitFailure extends AppFailure {
+  const DevelopmentFundingLimitFailure()
+    : super(
+        'This account has reached its PHP 100,000 Development funding limit for today in the Philippines.',
+      );
+}
+
+final class IdempotencyConflictFailure extends AppFailure {
+  const IdempotencyConflictFailure()
+    : super('That retry key was already used for a different request.');
+}

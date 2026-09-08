@@ -1,4 +1,5 @@
 using Banking.Api.Features.Authentication;
+using Banking.Api.Features.Ledger;
 using banking_lab.infrastructure.temporary;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -149,6 +150,53 @@ public sealed class AppDbContextModelTests
         Assert.True(activeToken.IsRevoked);
         Assert.Equal("replacement-hash", activeToken.ReplacedByTokenHash);
         Assert.NotNull(activeToken.RevokedAtUtc);
+    }
+
+    [Fact]
+    public void Model_MapsLedgerWithUniqueIdempotencyAndPostingPositions()
+    {
+        using var context = CreateContext();
+        var transaction = context.Model.FindEntityType(typeof(LedgerTransaction))!;
+        var posting = context.Model.FindEntityType(typeof(LedgerPosting))!;
+        Assert.Equal("LedgerTransactions", transaction.GetTableName());
+        Assert.Equal("LedgerPostings", posting.GetTableName());
+        Assert.Contains(transaction.GetIndexes(), index => index.IsUnique &&
+            index.GetDatabaseName() == LedgerTransaction.InitiatorIdempotencyIndex);
+        Assert.Contains(posting.GetIndexes(), index => index.IsUnique &&
+            index.GetDatabaseName() == LedgerPosting.TransactionPositionIndex);
+        Assert.All(transaction.GetForeignKeys(), key => Assert.Equal(DeleteBehavior.Restrict, key.DeleteBehavior));
+        Assert.All(posting.GetForeignKeys(), key => Assert.Equal(DeleteBehavior.Restrict, key.DeleteBehavior));
+    }
+
+    [Fact]
+    public async Task ContextRejectsUnbalancedAndChangedLedgerRecords()
+    {
+        await using var context = new AppDbContext(
+            new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+        var createdAtUtc = DateTime.UtcNow;
+        var transaction = new LedgerTransaction
+        {
+            Operation = LedgerTransaction.DevelopmentFundingOperation,
+            InitiatedByUserId = "user",
+            IdempotencyKey = Guid.NewGuid(),
+            RequestFingerprint = DevelopmentFundingPolicy.RequestFingerprint,
+            CreatedAtUtc = createdAtUtc,
+            Postings =
+            [
+                new LedgerPosting { Position = 1, BookAccount = LedgerPosting.SimulatorIssuer, AmountMinor = -1, CreatedAtUtc = createdAtUtc },
+                new LedgerPosting { Position = 2, CustomerAccountId = Guid.NewGuid(), AmountMinor = 2, CreatedAtUtc = createdAtUtc }
+            ]
+        };
+        context.LedgerTransactions.Add(transaction);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.SaveChangesAsync());
+
+        context.ChangeTracker.Clear();
+        transaction.Postings.Last().AmountMinor = 1;
+        context.LedgerTransactions.Add(transaction);
+        await context.SaveChangesAsync();
+        transaction.BalanceAfterMinor = 1;
+        await Assert.ThrowsAsync<InvalidOperationException>(() => context.SaveChangesAsync());
     }
 
     private static AppDbContext CreateContext()

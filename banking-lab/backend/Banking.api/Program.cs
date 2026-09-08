@@ -2,6 +2,7 @@ using System.Text;
 using Banking.Api.Features.Accounts;
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
+using Banking.Api.Features.Ledger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +25,10 @@ builder.Services.AddOptions<SmtpOptions>()
 builder.Services.AddTrustedLoopbackForwarding();
 builder.Services.AddAuthenticationRequestGuards();
 builder.Services.AddAccountRequestGuards();
+builder.Services.AddDevelopmentFundingRequestGuards();
 builder.Services.AddScoped<CustomerAccountService>();
+builder.Services.AddScoped<DevelopmentFundingService>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ICustomerPasswordBlocklist, InitialCustomerPasswordBlocklist>();
 builder.Services.AddSingleton<CustomerPasswordPolicy>();
 builder.Services.AddSingleton<IVerificationEmailSender, SmtpVerificationEmailSender>();
@@ -94,6 +98,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+var developmentFundingEnabled = app.Environment.IsDevelopment() ||
+    app.Environment.EnvironmentName == "Testing";
 
 // Tailscale Serve terminates TLS and proxies only to this machine's loopback
 // listener. Unknown callers cannot turn an HTTP request into HTTPS by adding a
@@ -118,8 +124,12 @@ app.Use(async (context, next) =>
     await next();
 });
 app.Use(AccountRequestGuards.EnforceTransportAsync);
+if (developmentFundingEnabled)
+    app.Use(DevelopmentFundingRequestGuards.EnforceTransportAsync);
 app.UseRateLimiter();
 app.Use(AccountRequestGuards.EnforceInputAsync);
+if (developmentFundingEnabled)
+    app.Use(DevelopmentFundingRequestGuards.EnforceInputAsync);
 app.Use(AuthenticationRequestGuards.EnforceAsync);
 app.UseAuthentication();
 app.UseAuthorization();
@@ -310,6 +320,8 @@ app.MapGet("/api/v1/auth/me", (HttpContext context) =>
     .Produces(StatusCodes.Status200OK).ProducesProblem(401).ProducesProblem(503);
 
 app.MapCustomerAccounts();
+if (developmentFundingEnabled)
+    app.MapDevelopmentFunding();
 app.Run();
 
 public partial class Program { }

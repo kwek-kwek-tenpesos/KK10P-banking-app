@@ -95,6 +95,57 @@ void main() {
     expect(find.text('Environment: Test'), findsOneWidget);
   });
 
+  testWidgets('Development diagnostics shows funding only after sign-in', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 1000);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(
+      _testApp(
+        store: _MemorySessionStore(),
+        api: _FakeAuthenticationApi(),
+        systemEnvironment: 'Development',
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('API diagnostics'));
+    await tester.tap(find.text('API diagnostics'));
+    await tester.pumpAndSettle();
+    expect(find.text('Development simulator funds'), findsNothing);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Email address'),
+      'customer@example.test',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Password'),
+      'fake-password',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byTooltip('API diagnostics'));
+    await tester.tap(find.byTooltip('API diagnostics'));
+    await tester.pumpAndSettle();
+    expect(find.text('Development simulator funds'), findsOneWidget);
+    expect(find.textContaining('not real money'), findsOneWidget);
+    final fundingAction = find.text('Add PHP 50,000 test funds');
+    await tester.ensureVisible(fundingAction);
+    await tester.tap(fundingAction);
+    await tester.pumpAndSettle();
+    expect(find.text('Add simulator funds?'), findsOneWidget);
+    expect(find.textContaining('maximum of PHP 100,000'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Add simulator funds?'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('login actions remain reachable at 320 width and 200% text', (
     tester,
   ) async {
@@ -164,7 +215,9 @@ void main() {
     );
     expect(store.refreshToken, 'new-refresh');
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Open account'));
+    await tester.tap(
+      find.widgetWithText(FilledButton, 'Open simulator account'),
+    );
     await tester.pumpAndSettle();
     expect(find.text('PHP 0.00'), findsOneWidget);
 
@@ -243,6 +296,7 @@ Widget _testApp({
   required _FakeAuthenticationApi api,
   StubAccountsApi? accounts,
   MemoryAppPreferencesStore? preferences,
+  String systemEnvironment = 'Test',
 }) {
   final preferenceStore =
       preferences ?? MemoryAppPreferencesStore(introductionCompleted: true);
@@ -258,10 +312,10 @@ Widget _testApp({
         accounts ?? StubAccountsApi(),
       ),
       systemInfoProvider.overrideWith(
-        (ref) async => const SystemInfo(
+        (ref) async => SystemInfo(
           name: 'Banking API',
           version: 'v1.0.0',
-          environment: 'Test',
+          environment: systemEnvironment,
         ),
       ),
     ],

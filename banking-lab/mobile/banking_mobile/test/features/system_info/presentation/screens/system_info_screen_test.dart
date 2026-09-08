@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:banking_mobile/core/config/app_config.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
+import 'package:banking_mobile/core/storage/secure_session_store.dart';
+import 'package:banking_mobile/core/storage/secure_session_store_provider.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:banking_mobile/features/system_info/presentation/screens/system_info_screen.dart';
@@ -23,6 +26,10 @@ void main() {
           appPreferencesStoreProvider.overrideWithValue(
             MemoryAppPreferencesStore(introductionCompleted: true),
           ),
+          appConfigProvider.overrideWithValue(
+            const AppConfig(apiBaseUrl: 'https://example.test'),
+          ),
+          secureSessionStoreProvider.overrideWithValue(_EmptySessionStore()),
           systemInfoProvider.overrideWith((ref) => completer.future),
         ],
         child: const MaterialApp(home: SystemInfoScreen()),
@@ -54,6 +61,10 @@ void main() {
           appPreferencesStoreProvider.overrideWithValue(
             MemoryAppPreferencesStore(introductionCompleted: true),
           ),
+          appConfigProvider.overrideWithValue(
+            const AppConfig(apiBaseUrl: 'https://example.test'),
+          ),
+          secureSessionStoreProvider.overrideWithValue(_EmptySessionStore()),
           systemInfoProvider.overrideWith((ref) async {
             requestCount++;
             throw const NetworkFailure();
@@ -80,4 +91,15 @@ void main() {
 
     expect(requestCount, 2);
   });
+}
+
+final class _EmptySessionStore implements SecureSessionStore {
+  @override
+  Future<void> clearRefreshToken() async {}
+
+  @override
+  Future<String?> readRefreshToken() async => null;
+
+  @override
+  Future<void> saveRefreshToken(String refreshToken) async {}
 }

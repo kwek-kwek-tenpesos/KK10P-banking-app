@@ -25,7 +25,7 @@ An AccountSummary contains only:
 }
 ```
 
-The sample is fictional. `id` is a simulator reference, not a real bank account number. `balanceMinor` is a base-10 integer string; Flutter parses it with BigInt and formats centavos without floating-point arithmetic. This slice accepts only PHP and zero. Nonzero/malformed data is an invalid response, never a display fallback.
+The sample is fictional. `id` is a simulator reference, not a real bank account number. `balanceMinor` is a canonical non-negative base-10 integer string bounded by PostgreSQL/.NET signed 64-bit storage; Flutter parses it with BigInt and formats centavos without floating-point arithmetic. Only PHP is accepted. Negative, decimal, signed, leading-zero, overflow, or otherwise malformed data is an invalid response, never a display fallback.
 
 GET performs no account writes. PUT inserts a server-generated UUID, validated owner, PHP currency, zero balance and UTC opening time. A unique UserId index makes repeats/concurrent attempts converge on one row. Only the named owner-index collision takes the race-recovery path: detach the failed insert and query the winner. Other constraint/programming failures are not converted into successful duplicates. Creation reads the committed row back to return PostgreSQL timestamp precision consistently with future reads.
 
@@ -51,7 +51,7 @@ GET performs no account writes. PUT inserts a server-generated UUID, validated o
 
 Migration `20260906042449_AddCustomerAccounts` adds this table/index/constraints only; existing identity/session tables are unchanged. It contains no seeds, backfill or automatic opening. It passed the disposable `banking_lab_accounts_test` fixture and was then applied to the separately approved, backed-up shared `banking_lab` database. Shared post-checks found zero account rows and unchanged identity/session/token counts. App startup does not apply migrations automatically.
 
-Zero is the only supported monetary state because no funds have been issued. A future funding/transfer design must establish ledger authority, postings, reconciliation and concurrency before changing the zero-only constraint. An editable balance field is not a substitute for that work.
+The currently deployed shared schema still permits zero only. The reviewed Slice 4 source and unapplied migration transition this to a non-negative snapshot backed by balanced, append-only journal postings; see the [ledger and Development funding contract](ledger-development-funding-contract.md). Until that migration receives separate rollout approval, no funds have been issued and the shared runtime remains at zero. An editable balance field is never a substitute for ledger authority, reconciliation, and concurrency control.
 
 The Down migration drops CustomerAccounts and would lose its data after use. Prefer reverting application code while retaining the additive table; schema/data rollback requires separate approval and a reviewed backup path.
 

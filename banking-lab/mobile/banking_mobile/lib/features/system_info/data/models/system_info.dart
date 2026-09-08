@@ -1,7 +1,7 @@
 class SystemInfo {
-  final dynamic environment;
-  final dynamic name;
-  final dynamic version;
+  final String environment;
+  final String name;
+  final String version;
 
   const SystemInfo({
     required this.name,
