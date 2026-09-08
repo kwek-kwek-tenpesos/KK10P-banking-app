@@ -1,6 +1,6 @@
 # KK10P Prototype-to-Flutter Master Roadmap
 
-- Status: Revision A approved. Slice 1 dual-theme material proof is implemented, automated checks pass and Chris approved the physical Light/Dark calibration on 2026-09-08. Slice 2 requires its own approved feature plan before implementation.
+- Status: Revision A, Slice 1 and Slice 2 are complete and physically approved. Slice 3 Home/account planning is next; no Slice 3 implementation is approved yet.
 - Prepared: 2026-09-07.
 - Goal: Translate the approved parts of the AI Studio Kotlin prototype into a clean, truthful and maintainable Flutter customer experience, then add the smallest backend-led fake-money features needed for Chris and Gio to transact.
 - Design source: [prototype adoption audit](../05_Design/kk10p-prototype-adoption-audit.md).
@@ -166,15 +166,15 @@ The introduction-completed and known-account values are local experience hints o
 
 ### Acceptance criteria
 
-- [ ] All existing auth success, validation, rate-limit, lockout, insecure-origin, offline and retry behavior remains unchanged.
-- [ ] No unsupported authentication method or security claim appears.
-- [ ] First install shows the introduction once; subsequent launches skip it; reinstall/cleared app data behaves as a first install.
-- [ ] A known attached account hides Create Account after login/session expiry, while explicit full logout shows it again.
-- [ ] Corrupt/missing experience flags fail safely to a usable signed-out route and never bypass authentication.
-- [ ] The introduction and About copy are sourced from verified repository behavior and remain accurate in both themes.
-- [ ] Password visibility semantics and secure-storage/session ordering tests still pass.
-- [ ] Layout passes at 320/360/412/768 widths and 200% text with keyboard-safe scrolling.
-- [ ] Physical Login/Registration/Verification comparison is accepted before moving on.
+- [x] All existing auth success, validation, rate-limit, lockout, insecure-origin, offline and retry behavior remains unchanged.
+- [x] No unsupported authentication method or security claim appears.
+- [x] First install shows the introduction once; subsequent launches skip it; reinstall/cleared app data behaves as a first install.
+- [x] A known attached account hides Create Account after login/session expiry, while explicit full logout shows it again.
+- [x] Corrupt/missing experience flags fail safely to a usable signed-out route and never bypass authentication.
+- [x] The introduction and About copy are sourced from verified repository behavior and remain accurate in both themes.
+- [x] Password visibility semantics and secure-storage/session ordering tests still pass.
+- [x] Layout passes at 320/360/412/768 widths and 200% text with keyboard-safe scrolling.
+- [x] Physical Login/Registration/Verification comparison is accepted before moving on.
 
 ## 7. Slice 3 — Current Account and Clean Home Foundation
 

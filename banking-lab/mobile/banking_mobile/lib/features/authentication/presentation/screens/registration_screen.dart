@@ -1,4 +1,5 @@
 import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_appearance_menu_button.dart';
 import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
 import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
@@ -48,7 +49,15 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Account')),
+      appBar: AppBar(
+        title: const Text('Create account'),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: KkSpacing.md),
+            child: KkAppearanceMenuButton(),
+          ),
+        ],
+      ),
       body: KkPageBody(
         padding: const EdgeInsets.fromLTRB(
           KkSpacing.lg,
@@ -70,6 +79,8 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const KkPreferencesWarning(),
+          const SizedBox(height: KkSpacing.lg),
           Icon(
             Icons.mark_email_read_outlined,
             size: 64,
@@ -77,7 +88,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           ),
           const SizedBox(height: KkSpacing.lg),
           Text(
-            'Registration Submitted',
+            'Registration submitted',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -117,7 +128,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
               context.go('/login');
             },
             icon: const Icon(Icons.arrow_back),
-            label: const Text('Return to App'),
+            label: const Text('Return to sign in'),
           ),
         ],
       ),
@@ -133,19 +144,27 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        const Align(
+          child: KkIconTile(icon: Icons.account_balance_rounded, size: 44),
+        ),
+        const SizedBox(height: KkSpacing.lg),
         Text(
-          'Join KK10P Bank',
+          'Create your KK10P account',
+          textAlign: TextAlign.center,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: KkSpacing.xs),
         Text(
-          'Sign up to begin simulator banking operations.',
+          'Register for the educational fake-money simulator.',
+          textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
+        const SizedBox(height: KkSpacing.md),
+        const KkPreferencesWarning(),
         const SizedBox(height: KkSpacing.lg),
         if (state.generalErrorMessage != null) ...[
           Semantics(
@@ -247,7 +266,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Register'),
+              : const Text('Create account'),
         ),
       ],
     );

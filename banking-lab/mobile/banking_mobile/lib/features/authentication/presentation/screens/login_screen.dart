@@ -1,5 +1,7 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_controller.dart';
 import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_appearance_menu_button.dart';
 import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
 import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
@@ -39,6 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authenticationControllerProvider);
+    final preferences = ref.watch(appPreferencesControllerProvider);
     final theme = Theme.of(context);
 
     if (state.status == AuthenticationStatus.initializing) {
@@ -57,6 +60,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Align(
+              alignment: Alignment.centerRight,
+              child: KkAppearanceMenuButton(),
+            ),
+            const SizedBox(height: KkSpacing.lg),
+            const Align(
               child: KkIconTile(icon: Icons.account_balance_rounded, size: 48),
             ),
             const SizedBox(height: KkSpacing.md),
@@ -69,7 +77,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: KkSpacing.xl),
             Text(
-              'Welcome back',
+              'Sign in to KK10P',
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
@@ -77,12 +85,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: KkSpacing.xs),
             Text(
-              'Sign in to your fake-money simulator account.',
+              'Access your educational fake-money simulator account.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            const SizedBox(height: KkSpacing.md),
+            const KkPreferencesWarning(),
             if (state.errorMessage != null) ...[
               const SizedBox(height: KkSpacing.lg),
               _ErrorBanner(message: state.errorMessage!),
@@ -155,15 +165,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: const Text('Retry saved session'),
               ),
             ],
-            const SizedBox(height: KkSpacing.md),
-            KkEmbossedButton(
-              variant: KkEmbossedButtonVariant.insetAccent,
-              onPressed: state.isSubmitting
-                  ? null
-                  : () => context.push('/register'),
-              icon: const Icon(Icons.person_add_outlined),
-              label: const Text('Create a customer account'),
-            ),
+            if (!preferences.knownAccountAttached) ...[
+              const SizedBox(height: KkSpacing.md),
+              KkEmbossedButton(
+                variant: KkEmbossedButtonVariant.insetAccent,
+                onPressed: state.isSubmitting
+                    ? null
+                    : () => context.push('/register'),
+                icon: const Icon(Icons.person_add_outlined),
+                label: const Text('Create account'),
+              ),
+            ],
             const SizedBox(height: KkSpacing.sm),
             KkEmbossedButton(
               variant: KkEmbossedButtonVariant.insetAccent,
@@ -176,13 +188,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               icon: const Icon(Icons.email_outlined),
               label: const Text('Resend verification email'),
             ),
-            const SizedBox(height: KkSpacing.xs),
+            const SizedBox(height: KkSpacing.lg),
             const Divider(),
-            const SizedBox(height: KkSpacing.md),
+            const SizedBox(height: KkSpacing.lg),
+            Text(
+              'Simulator information',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: KkSpacing.sm),
+            KkEmbossedButton(
+              onPressed: () => context.push('/about'),
+              icon: const Icon(Icons.info_outline),
+              label: const Text('About this simulator'),
+            ),
+            const SizedBox(height: KkSpacing.sm),
             KkEmbossedButton(
               onPressed: () => context.push('/diagnostics'),
               icon: const Icon(Icons.monitor_heart_outlined),
-              label: const Text('Open API diagnostics'),
+              label: const Text('API diagnostics'),
             ),
           ],
         ),
@@ -267,13 +293,18 @@ class _ResendVerificationDialogState
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
-            controller: _emailController,
-            enabled: !_submitting,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-            decoration: const InputDecoration(labelText: 'Email address'),
+          KkFieldSurface(
+            child: TextField(
+              controller: _emailController,
+              enabled: !_submitting,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
+              decoration: const InputDecoration(
+                labelText: 'Email address',
+                prefixIcon: Icon(Icons.email_outlined),
+              ),
+            ),
           ),
           if (_message != null) ...[
             const SizedBox(height: 12),

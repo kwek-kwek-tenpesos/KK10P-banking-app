@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:banking_mobile/features/system_info/presentation/screens/system_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../../support/memory_app_preferences_store.dart';
 
 void main() {
   testWidgets('shows loading state while the request is pending', (
@@ -16,7 +19,12 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [systemInfoProvider.overrideWith((ref) => completer.future)],
+        overrides: [
+          appPreferencesStoreProvider.overrideWithValue(
+            MemoryAppPreferencesStore(introductionCompleted: true),
+          ),
+          systemInfoProvider.overrideWith((ref) => completer.future),
+        ],
         child: const MaterialApp(home: SystemInfoScreen()),
       ),
     );
@@ -43,6 +51,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appPreferencesStoreProvider.overrideWithValue(
+            MemoryAppPreferencesStore(introductionCompleted: true),
+          ),
           systemInfoProvider.overrideWith((ref) async {
             requestCount++;
             throw const NetworkFailure();

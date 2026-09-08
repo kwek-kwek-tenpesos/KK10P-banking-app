@@ -1,6 +1,6 @@
 # KK10P Prototype Adoption Audit
 
-- Status: Flutter/ASP.NET, prototype-reference direction and corrected Revision A approved by Chris. Slice 1 dual-theme material proof and its physical Light/Dark calibration were approved on 2026-09-08.
+- Status: Flutter/ASP.NET, prototype-reference direction and corrected Revision A approved by Chris. Slice 1 and Slice 2 first-install/auth adoption are physically approved as of 2026-09-08.
 - Audit date: 2026-09-07.
 - Product boundary: Educational, fake-money Banking Lab—not a real bank or payment service.
 - Prototype inspected read-only: `D:\OtherProjects\Banking-UI-UX-Prototype`.

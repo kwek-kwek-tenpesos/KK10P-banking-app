@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_controller.dart';
 import 'package:banking_mobile/features/authentication/data/models/authentication_models.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,12 +29,13 @@ class AuthenticationState {
 }
 
 class AuthenticationController extends StateNotifier<AuthenticationState> {
-  AuthenticationController(this._repository)
+  AuthenticationController(this._repository, this._preferences)
     : super(const AuthenticationState.initializing()) {
     unawaited(initialize());
   }
 
   final AuthenticationRepository _repository;
+  final AppPreferencesController _preferences;
   Future<void>? _initialization;
   int _operation = 0;
 
@@ -49,6 +51,10 @@ class AuthenticationController extends StateNotifier<AuthenticationState> {
     try {
       final session = await _repository.restoreSession();
       if (!mounted || operation != _operation) return;
+      if (session != null) {
+        await _preferences.markKnownAccountAttached();
+        if (!mounted || operation != _operation) return;
+      }
       state = session == null
           ? const AuthenticationState(status: AuthenticationStatus.signedOut)
           : AuthenticationState(
@@ -91,6 +97,8 @@ class AuthenticationController extends StateNotifier<AuthenticationState> {
         password: password,
       );
       if (!mounted || operation != _operation) return false;
+      await _preferences.markKnownAccountAttached();
+      if (!mounted || operation != _operation) return false;
       state = AuthenticationState(
         status: AuthenticationStatus.signedIn,
         customer: session.customer,
@@ -119,17 +127,25 @@ class AuthenticationController extends StateNotifier<AuthenticationState> {
     state = AuthenticationState(status: AuthenticationStatus.submitting);
 
     String? warning;
+    var localCredentialsCleared = false;
     try {
       await _repository.logout();
+      localCredentialsCleared = true;
     } on SessionStorageFailure {
       warning = 'Secure session storage could not be cleared. Server logout is unconfirmed. Please retry sign-in.';
     } on AppFailure catch (failure) {
+      localCredentialsCleared = true;
       warning = '${failure.message} Local credentials were removed.';
     } catch (_) {
+      localCredentialsCleared = true;
       warning = 'Server logout could not be confirmed. Local credentials were removed.';
     }
 
     if (!mounted || operation != _operation) return;
+    if (localCredentialsCleared) {
+      await _preferences.clearKnownAccountAttached();
+      if (!mounted || operation != _operation) return;
+    }
     state = AuthenticationState(
       status: AuthenticationStatus.signedOut,
       errorMessage: warning,
@@ -159,5 +175,6 @@ final authenticationControllerProvider =
     StateNotifierProvider<AuthenticationController, AuthenticationState>((ref) {
       return AuthenticationController(
         ref.watch(authenticationRepositoryProvider),
+        ref.read(appPreferencesControllerProvider.notifier),
       );
     });

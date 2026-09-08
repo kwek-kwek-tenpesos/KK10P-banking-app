@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-08 — KK10P first-install and authentication surfaces
+- Added a truthful first-install Welcome/reusable About experience, persistent Light/Dark/System appearance, coordinated preference/session startup, a non-authorizing known-account presentation hint and prototype-inspired auth/diagnostics composition. Removed the Flutter preview gallery; physical review now uses normal hot reload. No backend, database or API contract changed. Analysis passed, the complete Flutter suite passed 149/149, and Chris accepted every physical Light/Dark Slice 2 checklist item on 2026-09-08.
+
 ### 2026-09-08 — Approved KK10P material baseline
 - Finalized the physically approved warm-neutral Light and charcoal Dark material tokens, compact paired depth, restrained raised-surface hairlines, blue-action press behavior and calibrated inset shadows without changing API or authentication behavior. Analysis passed and the complete Flutter suite passed 131/131; the APK rebuild was intentionally skipped at Chris's request after hot-reload device verification.
 

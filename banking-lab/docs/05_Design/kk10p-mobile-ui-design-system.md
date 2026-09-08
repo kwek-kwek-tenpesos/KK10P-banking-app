@@ -1,6 +1,6 @@
 # KK10P Bank Mobile Experience and UI Design Direction
 
-- Status: Canonical customer-mobile design direction. The dual-theme material proof, blue-only accents, compact paired lighting and rapid native-button feedback are implemented; Chris approved the physical Light/Dark calibration on 2026-09-08. Screen rollout and TalkBack review remain later-slice work.
+- Status: Canonical customer-mobile design direction. The dual-theme material and Slice 2 first-install/authentication surfaces are physically approved. Home rollout and Home/account TalkBack review remain later-slice work.
 - Product: KK10P Bank educational fake-money prototype and public showcase.
 - Audience: Chris, Gio and future contributors.
 - Related implementation plan: [mobile UI foundation plan](../02_Planning/plan-kk10p-mobile-ui-foundation.md).
@@ -93,10 +93,11 @@ Startup and session restoration
 
 | Area | Current state | Intended direction |
 | --- | --- | --- |
-| Startup | Progress indicator while restoring auth | Branded but lightweight startup state; no fake delay |
-| Login | Functional Material 3 form | Hybrid-neumorphic auth card with the same validation and actions |
-| Registration | Email, password and optional display name | Same contract; improve hierarchy and field presentation only |
-| Email confirmation | One-use link confirmation screen | Same behavior with clearer success/error presentation |
+| Startup | Branded progress while restoring preferences and auth | Implemented; real reads only, no fake delay |
+| Welcome/About | Truthful first-install explanation and reusable About | Implemented; local completion never authorizes access |
+| Login | Email/password form with separated support/info actions | Implemented with existing validation and controller behavior |
+| Registration | Email, password and optional display name | Implemented with the same contract and improved hierarchy |
+| Email confirmation | One-use link confirmation screen | Implemented with clearer state presentation and no token rendering |
 | Home | Greeting, account card, diagnostics and sign-out | Foundation for a future account dashboard |
 | Account | Unopened/loading/loaded/error states in Home | Preserve all states; improve hierarchy without inventing funds |
 | Transfer | Not implemented | Future planned multi-step flow; no placeholder action yet |
@@ -126,13 +127,13 @@ Customer KYC/AML, administrator provisioning, the administrator portal, phone pa
 
 - KK10P Bank currently has no logo; keep the icon/logo slot replaceable.
 - Use the platform font initially; custom font selection is deferred.
-- App-wide Light/Dark/System selection and persistence are planned with the first-install/auth surface slice; Slice 1 established and physically approved both material palettes.
+- App-wide Light/Dark/System selection and persistence are implemented through versioned local experience preferences. The choice changes presentation only and never participates in authentication or authorization.
 - Illustration and 3D artwork are optional future enhancements, not prerequisites.
 - Final administrator-portal platform and its visual system require a separate decision.
 
 ## 10. Design Acceptance Boundary
 
-The approved Slice 1 proof establishes one coherent blue-accent tactile material in Light and Dark without changing authentication, account or API behavior. Ordinary controls use compact, role-specific depth and 70 ms native-state feedback; inset treatment is reserved for editable, selected and pressed states. Automated responsive, cancellation, rapid-tap, single-flight and semantics gates passed, and the complete suite passed 131/131. Chris physically approved the final material calibration after hot-reload testing on 2026-09-08. Full auth/Home layout adoption and Home/account TalkBack listening remain later-slice work; this approval does not mean transfers, history, KYC or the administrator experience is complete.
+The approved Slice 1 proof establishes one coherent blue-accent tactile material in Light and Dark without changing authentication, account or API behavior. Ordinary controls use compact, role-specific depth and 70 ms native-state feedback; inset treatment is reserved for editable, selected and pressed states. Chris physically approved the material calibration and Slice 2 first-install/authentication surfaces after hot-reload testing on 2026-09-08. The complete Flutter suite passed 149/149. Home layout adoption, Home/account TalkBack, transfers, history, KYC, local biometric/device-credential app lock and the administrator experience remain later work.
 
 ## 11. Lighting Reference Refinement
 

@@ -1,4 +1,5 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
 import 'package:banking_mobile/core/storage/secure_session_store.dart';
 import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:banking_mobile/features/authentication/data/models/registration_request.dart';
@@ -8,6 +9,8 @@ import 'package:banking_mobile/features/authentication/presentation/screens/regi
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../../../support/memory_app_preferences_store.dart';
 
 void main() {
   group('RegistrationScreen', () {
@@ -21,6 +24,9 @@ void main() {
       return ProviderScope(
         overrides: [
           authenticationRepositoryProvider.overrideWithValue(fakeRepository),
+          appPreferencesStoreProvider.overrideWithValue(
+            MemoryAppPreferencesStore(introductionCompleted: true),
+          ),
         ],
         child: MaterialApp(
           theme: KkTheme.light(),
@@ -34,19 +40,24 @@ void main() {
     ) async {
       await tester.pumpWidget(createTestWidget());
 
-      expect(find.text('Create Account'), findsOneWidget);
-      expect(find.text('Join KK10P Bank'), findsOneWidget);
+      expect(find.text('Create account'), findsNWidgets(2));
+      expect(find.text('Create your KK10P account'), findsOneWidget);
       expect(find.byType(TextField), findsNWidgets(3));
       expect(find.text('Email address'), findsOneWidget);
       expect(find.text('Password'), findsOneWidget);
       expect(find.text('Display name (optional)'), findsOneWidget);
-      expect(find.widgetWithText(FilledButton, 'Register'), findsOneWidget);
+      expect(
+        find.widgetWithText(FilledButton, 'Create account'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows validation errors when submitted empty', (tester) async {
       await tester.pumpWidget(createTestWidget());
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Register'));
+      final submit = find.widgetWithText(FilledButton, 'Create account');
+      await tester.ensureVisible(submit);
+      await tester.tap(submit);
       await tester.pumpAndSettle();
 
       expect(find.text('Email is required.'), findsOneWidget);
@@ -94,10 +105,12 @@ void main() {
         'Chris',
       );
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Register'));
+      final submit = find.widgetWithText(FilledButton, 'Create account');
+      await tester.ensureVisible(submit);
+      await tester.tap(submit);
       await tester.pumpAndSettle();
 
-      expect(find.text('Registration Submitted'), findsOneWidget);
+      expect(find.text('Registration submitted'), findsOneWidget);
       expect(find.text('Check your email to verify.'), findsOneWidget);
       expect(
         find.text(
@@ -105,7 +118,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Return to App'), findsOneWidget);
+      expect(find.text('Return to sign in'), findsOneWidget);
     });
 
     testWidgets('displays error banner when repository throws failure', (
@@ -124,7 +137,9 @@ void main() {
         'ValidPassword123!',
       );
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Register'));
+      final submit = find.widgetWithText(FilledButton, 'Create account');
+      await tester.ensureVisible(submit);
+      await tester.tap(submit);
       await tester.pumpAndSettle();
 
       expect(
@@ -147,11 +162,11 @@ void main() {
         addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
         await tester.pumpWidget(createTestWidget());
-        await tester.ensureVisible(find.text('Register'));
+        await tester.ensureVisible(find.text('Create account').last);
         await tester.pumpAndSettle();
 
         expect(tester.takeException(), isNull);
-        expect(find.text('Register'), findsOneWidget);
+        expect(find.text('Create account'), findsNWidgets(2));
       });
     }
   });

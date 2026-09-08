@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:banking_mobile/app/app.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
+import 'package:banking_mobile/core/preferences/app_preferences_store.dart';
 import 'package:banking_mobile/features/accounts/data/models/account_summary.dart';
 import 'package:banking_mobile/features/accounts/data/services/accounts_api_service.dart';
 import 'package:banking_mobile/core/config/app_config.dart';
@@ -18,8 +20,57 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'features/accounts/account_test_support.dart';
+import 'support/memory_app_preferences_store.dart';
 
 void main() {
+  testWidgets('first install shows truthful welcome and records chosen path', (
+    tester,
+  ) async {
+    final preferences = MemoryAppPreferencesStore();
+    await tester.pumpWidget(
+      _testApp(
+        store: _MemorySessionStore(),
+        api: _FakeAuthenticationApi(),
+        preferences: preferences,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome to KK10P'), findsOneWidget);
+    expect(find.text('Fake money only'), findsOneWidget);
+    expect(find.text('Not a financial institution'), findsOneWidget);
+    expect(find.textContaining('hardware encrypted'), findsNothing);
+
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(preferences.snapshot.introductionCompleted, isTrue);
+    expect(find.text('Sign in to KK10P'), findsOneWidget);
+  });
+
+  testWidgets('appearance choice updates the app and persists', (tester) async {
+    final preferences = MemoryAppPreferencesStore();
+    await tester.pumpWidget(
+      _testApp(
+        store: _MemorySessionStore(),
+        api: _FakeAuthenticationApi(),
+        preferences: preferences,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.widgetWithText(OutlinedButton, 'Dark'));
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Dark'));
+    await tester.pumpAndSettle();
+
+    expect(preferences.snapshot.appearance, AppAppearance.dark);
+    expect(
+      tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+      ThemeMode.dark,
+    );
+  });
+
   testWidgets('signed-out customer can open API diagnostics', (tester) async {
     final store = _MemorySessionStore();
     await tester.pumpWidget(
@@ -35,8 +86,8 @@ void main() {
     expect(find.text('Sign in'), findsOneWidget);
     expect(find.byTooltip('Show password'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('Open API diagnostics'));
-    await tester.tap(find.text('Open API diagnostics'));
+    await tester.ensureVisible(find.text('API diagnostics'));
+    await tester.tap(find.text('API diagnostics'));
     await tester.pumpAndSettle();
 
     expect(find.text('Banking API'), findsOneWidget);
@@ -59,8 +110,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome back'), findsOneWidget);
-    await tester.ensureVisible(find.text('Open API diagnostics'));
+    expect(find.text('Sign in to KK10P'), findsOneWidget);
+    await tester.ensureVisible(find.text('API diagnostics'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
@@ -73,10 +124,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Create a customer account'));
-    await tester.tap(find.text('Create a customer account'));
+    await tester.ensureVisible(find.text('Create account'));
+    await tester.tap(find.text('Create account'));
     await tester.pumpAndSettle();
-    expect(find.text('Join KK10P Bank'), findsOneWidget);
+    expect(find.text('Create your KK10P account'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
@@ -122,6 +173,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Sign in'), findsOneWidget);
+    expect(find.text('Create account'), findsOneWidget);
     expect(store.refreshToken, isNull);
     expect(api.loggedOutTokens, ['new-refresh']);
   });
@@ -149,6 +201,7 @@ void main() {
     expect(find.text('Sign in'), findsOneWidget);
     expect(store.refreshToken, isNull);
     expect(find.text('Simulator funds'), findsNothing);
+    expect(find.text('Create account'), findsNothing);
   });
 
   testWidgets('logout while account request is pending discards late data', (
@@ -189,13 +242,17 @@ Widget _testApp({
   required _MemorySessionStore store,
   required _FakeAuthenticationApi api,
   StubAccountsApi? accounts,
+  MemoryAppPreferencesStore? preferences,
 }) {
+  final preferenceStore =
+      preferences ?? MemoryAppPreferencesStore(introductionCompleted: true);
   return ProviderScope(
     overrides: [
       appConfigProvider.overrideWithValue(
         const AppConfig(apiBaseUrl: 'https://example.test'),
       ),
       secureSessionStoreProvider.overrideWithValue(store),
+      appPreferencesStoreProvider.overrideWithValue(preferenceStore),
       authenticationApiServiceProvider.overrideWithValue(api),
       accountsApiServiceProvider.overrideWithValue(
         accounts ?? StubAccountsApi(),

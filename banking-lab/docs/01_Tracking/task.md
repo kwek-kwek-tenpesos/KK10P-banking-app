@@ -2,27 +2,29 @@
 
 Template Version: Docs_ProjectWorkflowStarterKit_v2.0
 
-- Status: Slice 1 dual-theme material proof is complete and physically approved; no Slice 2 implementation is authorized yet.
+- Status: Slice 1 and Slice 2 are complete, physically accepted and archived. The Slice 3 plan is drafted and awaiting explicit implementation approval.
 - Target: Selectively rebuild approved prototype layouts in Flutter while preserving the ASP.NET/PostgreSQL behavioral and security boundaries.
-- Scope Guard: The completed slice changed only Flutter material UI, its isolated proof route, tests and documentation. No backend, database, API, dependency or prototype-repository change occurred.
+- Scope Guard: No Slice 3, biometric/PIN, backend, API, database, migration or administrator work is authorized by the completed Slice 2 acceptance.
 
 ---
 
 ## [CURRENT EXECUTION STATE - HANDOFF]
 
 - Active Roadmap: [KK10P prototype-to-Flutter roadmap](../02_Planning/plan-kk10p-prototype-to-flutter-roadmap.md).
-- Completed Slice: [Archived Slice 1 task](archive/task-2026-09-08-kk10p-dual-theme-material-proof.md).
+- Completed Slice 2: [Archived Slice 2 task](archive/task-2026-09-08-kk10p-slice-2-first-install-auth-surfaces.md).
 - Design Sources: [Prototype adoption audit](../05_Design/kk10p-prototype-adoption-audit.md) and [mobile UI design system](../05_Design/kk10p-mobile-ui-design-system.md).
 - Behavioral Sources: [Authentication](../04_Architecture/customer-authentication-contract.md) and [accounts](../04_Architecture/customer-accounts-contract.md).
-- Current Status: Warm-neutral Light and charcoal Dark material tokens, shared raised/inset/flat/solid-blue roles and the isolated material proof are approved. The app remains Light-only outside the proof until a later approved appearance-flow implementation.
-- Verification: `flutter analyze` passed; focused material checks passed 20/20; `flutter test --concurrency=1` passed 131/131. Chris approved the physical Light/Dark and pressed-state calibration after hot reload. Final APK rebuild was intentionally skipped at Chris's request.
-- Frontend-First Boundary: Existing APIs may support the next auth and account layout slices. Funding, transfers and Activity remain unavailable until their backend contracts and implementations are separately approved.
-- Next Immediate Action: Draft Slice 2 as a feature-specific plan for first-install state, persistent appearance selection and existing authentication surfaces; obtain explicit approval before implementation.
-- Deferred: Funding/ledger, transfers/history, administrator portal, password recovery, PIN/biometrics/passkeys, KYC, notifications, savings, schedules, external rails, Bluetooth and AI guards.
+- Verification: Slice 2 passed `flutter analyze`, 149/149 serialized Flutter tests and every Chris-run physical Light/Dark checklist item on 2026-09-08.
+- Runtime Observation: Repeated balance refreshes produced safe too-many-attempts feedback, confirming visible handling of the existing server limit during Chris's phone review.
+- Documentation Preference: Keep future walkthroughs proportional to the change. Always include the important runnable syntax and commands, but reserve exhaustive setup/reproduction detail for large or risky deliveries.
+- Frontend-First Boundary: Slice 3 may recompose only the current API-backed Home/account states after its own plan approval. Funding, transfers and Activity remain unavailable until their backend contracts and implementations are separately approved.
+- Slice 3 Draft: [Current Account and Clean Home Foundation](../02_Planning/plan-kk10p-slice-3-current-account-clean-home.md).
+- Walkthrough Backbone: Future delivery walkthroughs retain Delivered Outcome, Concepts Used, Logic Flow, Important Repository Paths, Commands/Syntax, Verification Results, Safe Customization Points, Limitations and Next Steps; detail remains proportional to risk and change size.
+- Recommended Next Action: Chris reviews the Slice 3 plan; do not implement it until he explicitly approves it.
+- Deferred Security Track: Local biometric/device-credential or app-PIN locking is separate from refresh-token persistence and needs a dedicated authentication/security plan before implementation.
 
 ## Active Checklist
 
-- [x] Archive the completed and physically approved Slice 1 material proof.
-- [ ] Draft the Slice 2 feature-specific implementation plan.
-- [ ] Review affected files, state boundaries, acceptance tests and security invariants.
-- [ ] Obtain Chris's explicit Slice 2 implementation approval.
+- [x] Draft the feature-specific Slice 3 Home/account plan for review.
+- [ ] Obtain Chris's explicit approval before implementing Slice 3.
+- [ ] Decide later whether local app lock belongs before money-movement slices; do not expose biometric/PIN controls before its separate approval.

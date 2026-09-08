@@ -1,8 +1,8 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/ui/kk_appearance_menu_button.dart';
 import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
 import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
-import 'package:banking_mobile/features/authentication/presentation/screens/registration_screen.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +19,10 @@ class SystemInfoScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('KK10P Bank'),
         actions: [
+          const Padding(
+            padding: EdgeInsets.only(right: 4),
+            child: KkAppearanceMenuButton(),
+          ),
           IconButton(
             onPressed: () => context.push('/material-proof'),
             tooltip: 'Open material proof',
@@ -59,16 +63,9 @@ class SystemInfoScreen extends ConsumerWidget {
                 Text('Environment: ${systemInfo.environment}'),
                 const SizedBox(height: 24),
                 KkEmbossedButton(
-                  variant: KkEmbossedButtonVariant.primary,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const RegistrationScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.person_add_outlined),
-                  label: const Text('Create Account'),
+                  onPressed: () => context.push('/about'),
+                  icon: const Icon(Icons.info_outline),
+                  label: const Text('About KK10P'),
                 ),
               ],
             ),

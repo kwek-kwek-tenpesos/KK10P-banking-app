@@ -1,5 +1,6 @@
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/theme/kk_theme.dart';
+import 'package:banking_mobile/core/ui/kk_appearance_menu_button.dart';
 import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
 import 'package:banking_mobile/core/ui/kk_page_body.dart';
 import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
@@ -62,13 +63,23 @@ class _EmailVerificationScreenState
     final invalidLink = !_hasLinkData;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Verify email')),
+      appBar: AppBar(
+        title: const Text('Verify email'),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: KkSpacing.md),
+            child: KkAppearanceMenuButton(),
+          ),
+        ],
+      ),
       body: KkPageBody(
         child: KkSoftSurface(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const KkPreferencesWarning(),
+              const SizedBox(height: KkSpacing.md),
               Icon(
                 _confirmed
                     ? Icons.verified_outlined
