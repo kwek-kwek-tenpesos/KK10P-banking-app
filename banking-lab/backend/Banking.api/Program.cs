@@ -3,6 +3,8 @@ using Banking.Api.Features.Accounts;
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
 using Banking.Api.Features.Ledger;
+using Banking.Api.Features.Transfers;
+using Banking.Api.Observability;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -26,8 +28,10 @@ builder.Services.AddTrustedLoopbackForwarding();
 builder.Services.AddAuthenticationRequestGuards();
 builder.Services.AddAccountRequestGuards();
 builder.Services.AddDevelopmentFundingRequestGuards();
+builder.Services.AddInternalTransferRequestGuards();
 builder.Services.AddScoped<CustomerAccountService>();
 builder.Services.AddScoped<DevelopmentFundingService>();
+builder.Services.AddScoped<InternalTransferService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ICustomerPasswordBlocklist, InitialCustomerPasswordBlocklist>();
 builder.Services.AddSingleton<CustomerPasswordPolicy>();
@@ -96,6 +100,9 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
+builder.Services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
+    context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier);
 
 var app = builder.Build();
 var developmentFundingEnabled = app.Environment.IsDevelopment() ||
@@ -105,6 +112,9 @@ var developmentFundingEnabled = app.Environment.IsDevelopment() ||
 // listener. Unknown callers cannot turn an HTTP request into HTTPS by adding a
 // forwarded header because only exact loopback proxy addresses are trusted.
 app.UseForwardedHeaders();
+if (!app.Environment.IsDevelopment() && app.Environment.EnvironmentName != "Testing")
+    app.UseHsts();
+app.UseRequestCorrelation();
 
 app.Use(async (context, next) =>
 {
@@ -112,24 +122,28 @@ app.Use(async (context, next) =>
     context.Response.Headers.Append("X-Frame-Options", "DENY");
     context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
     context.Response.Headers.Append("X-Permitted-Cross-Domain-Policies", "none");
+    context.Response.Headers.Append("Cross-Origin-Resource-Policy", "same-site");
     await next();
 });
 
 app.UseRouting();
-// Ensure even throttled auth responses cannot be cached.
+// Ensure even throttled protected responses cannot be cached.
 app.Use(async (context, next) =>
 {
-    if (context.Request.Path.StartsWithSegments("/api/v1/auth"))
+    if (context.Request.Path.StartsWithSegments("/api/v1/auth") ||
+        context.Request.Path.StartsWithSegments(InternalTransferEndpoints.RoutePrefix))
         context.Response.Headers.CacheControl = "no-store";
     await next();
 });
 app.Use(AccountRequestGuards.EnforceTransportAsync);
 if (developmentFundingEnabled)
     app.Use(DevelopmentFundingRequestGuards.EnforceTransportAsync);
+app.Use(InternalTransferRequestGuards.EnforceTransportAsync);
 app.UseRateLimiter();
 app.Use(AccountRequestGuards.EnforceInputAsync);
 if (developmentFundingEnabled)
     app.Use(DevelopmentFundingRequestGuards.EnforceInputAsync);
+app.Use(InternalTransferRequestGuards.EnforceInputAsync);
 app.Use(AuthenticationRequestGuards.EnforceAsync);
 app.UseAuthentication();
 app.UseAuthorization();
@@ -322,6 +336,7 @@ app.MapGet("/api/v1/auth/me", (HttpContext context) =>
 app.MapCustomerAccounts();
 if (developmentFundingEnabled)
     app.MapDevelopmentFunding();
+app.MapInternalTransfers();
 app.Run();
 
 public partial class Program { }

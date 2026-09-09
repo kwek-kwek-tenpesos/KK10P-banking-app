@@ -1,7 +1,8 @@
 sealed class AppFailure implements Exception {
-  const AppFailure(this.message);
+  const AppFailure(this.message, {this.requestId});
 
   final String message;
+  final String? requestId;
 
   @override
   String toString() => '$runtimeType: $message';
@@ -25,14 +26,14 @@ final class TimeoutFailure extends AppFailure {
 }
 
 final class ServerFailure extends AppFailure {
-  const ServerFailure({this.statusCode})
+  const ServerFailure({this.statusCode, super.requestId})
     : super('The server could not complete the request. Please try again.');
 
   final int? statusCode;
 }
 
 final class InvalidResponseFailure extends AppFailure {
-  const InvalidResponseFailure()
+  const InvalidResponseFailure({super.requestId})
     : super('The server returned data the app could not understand.');
 }
 
@@ -46,7 +47,11 @@ final class UnexpectedFailure extends AppFailure {
 }
 
 final class ValidationFailure extends AppFailure {
-  const ValidationFailure(super.message, {this.fieldErrors = const {}});
+  const ValidationFailure(
+    super.message, {
+    this.fieldErrors = const {},
+    super.requestId,
+  });
 
   final Map<String, List<String>> fieldErrors;
 }
@@ -61,8 +66,10 @@ final class InvalidCredentialsFailure extends AppFailure {
 }
 
 final class RateLimitedFailure extends AppFailure {
-  const RateLimitedFailure()
+  const RateLimitedFailure({this.retryAfterSeconds, super.requestId})
     : super('Too many attempts. Please wait a moment and try again.');
+
+  final int? retryAfterSeconds;
 }
 
 final class SessionStorageFailure extends AppFailure {
@@ -85,4 +92,49 @@ final class DevelopmentFundingLimitFailure extends AppFailure {
 final class IdempotencyConflictFailure extends AppFailure {
   const IdempotencyConflictFailure()
     : super('That retry key was already used for a different request.');
+}
+
+final class TransferAccountRequiredFailure extends AppFailure {
+  const TransferAccountRequiredFailure({super.requestId})
+    : super('Open your simulator account before transferring funds.');
+}
+
+final class TransferRecipientNotFoundFailure extends AppFailure {
+  const TransferRecipientNotFoundFailure({super.requestId})
+    : super('That simulator account cannot receive this transfer.');
+}
+
+final class TransferSelfNotAllowedFailure extends AppFailure {
+  const TransferSelfNotAllowedFailure({super.requestId})
+    : super('Choose another simulator account.');
+}
+
+final class TransferInsufficientFundsFailure extends AppFailure {
+  const TransferInsufficientFundsFailure({super.requestId})
+    : super('Your simulator account does not have enough funds.');
+}
+
+final class TransferDailyLimitFailure extends AppFailure {
+  const TransferDailyLimitFailure({super.requestId})
+    : super(
+        'This transfer would exceed the PHP 100,000 daily outgoing limit for the current Philippine day.',
+      );
+}
+
+final class TransferIdempotencyConflictFailure extends AppFailure {
+  const TransferIdempotencyConflictFailure({super.requestId})
+    : super(
+        'This transfer retry no longer matches the server record. Do not submit it as a new transfer.',
+      );
+}
+
+final class PendingTransferStorageFailure extends AppFailure {
+  const PendingTransferStorageFailure({this.corrupt = false})
+    : super(
+        corrupt
+            ? 'Saved transfer recovery data is damaged. New transfers are blocked until it is safely reconciled.'
+            : 'Secure transfer recovery storage is unavailable. Transfers are blocked until it is available.',
+      );
+
+  final bool corrupt;
 }

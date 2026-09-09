@@ -93,7 +93,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         ledgerTransaction.ToTable("LedgerTransactions", table =>
         {
             table.HasCheckConstraint("CK_LedgerTransactions_Operation",
-                $"\"Operation\" = '{LedgerTransaction.DevelopmentFundingOperation}'");
+                $"\"Operation\" IN ('{LedgerTransaction.DevelopmentFundingOperation}', " +
+                $"'{LedgerTransaction.InternalTransferOperation}')");
             table.HasCheckConstraint("CK_LedgerTransactions_Currency", "\"Currency\" = 'PHP'");
             table.HasCheckConstraint("CK_LedgerTransactions_NonnegativeBalance", "\"BalanceAfterMinor\" >= 0");
             table.HasCheckConstraint("CK_LedgerTransactions_FingerprintLength",

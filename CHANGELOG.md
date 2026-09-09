@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-10 — Gate 6R shared internal-transfer rollout
+- Backed up and reconciled shared `banking_lab`, quiesced the API, applied only `20260909065721_AddInternalTransfers`, verified the widened two-operation check and unchanged users/accounts/balances/journal totals, then restarted the Development API with a successful read-only health check. No funding or transfer was executed; the small Chris↔Gio phone transfer remains manual.
+
+### 2026-09-09 — KK10P Flutter internal-transfer candidate
+- Added a protected Recipient → Amount → Review transfer journey, exact PHP-centavo parsing, strict server receipts, Home transfer/reference-copy actions, one-refresh authentication handling, and customer-scoped secure same-key recovery for rapid taps, restarts, and uncertain outcomes. Flutter analysis, all 203 tests, and an Android debug build pass; all 237 ordinary backend tests pass with 20 opt-in PostgreSQL tests skipped. Shared migration and the first live phone transfer remain gated and were not performed.
+
+### 2026-09-09 — OWASP ZAP Gate B evidence
+- Completed an authenticated safe-then-active ZAP gate against a dedicated HTTPS API and disposable `banking_lab_zap_test` database. Safe mode covered the generated 20-target OpenAPI inventory with no FAIL results. Exact PostgreSQL reproduction classified the active logout SQL-injection alert as a false positive and added regression coverage; CORP and production-only HSTS hardening were added. The disposable target was removed, 237 ordinary backend tests and 60 scanner safety checks passed, and the shared API/database remained outside the scan.
+
+### 2026-09-09 — KK10P internal-transfer backend candidate
+- Added an authenticated, source-owner-derived PHP internal-transfer API with strict centavo input, PHP 50,000 per-transfer and PHP 100,000 Philippine-day outgoing limits, UUID idempotency, deterministic two-account locking, atomic conserved balances, balanced customer postings, no-store correlated errors, and privacy-safe outcome timing. The constraint-only candidate migration passed six fresh disposable PostgreSQL upgrade/concurrency/constraint tests; 234 ordinary backend and 177 Flutter tests passed with clean analysis. Shared migration, live transfer, Flutter Transfer UI, authenticated active ZAP, Git writes, and production rollout remain pending approval.
+
 ### 2026-09-09 — KK10P ledger and Development funding candidate
 - Added an append-only balanced PHP journal, atomic non-negative account snapshots, and a Development-only fixed PHP 50,000 self-grant capped at PHP 100,000 per account per Philippine day. Added UUID idempotency, account-row serialization, bounded/rate-limited secure input, a confirmation-gated authenticated Diagnostics action, migration/architecture documentation, and concurrency/security coverage. Verification passed 211 ordinary backend tests, 4/4 fresh disposable PostgreSQL ledger tests, clean Flutter analysis, and 177/177 Flutter tests. After explicit approval and verified backup, only the reviewed migration was applied to shared `banking_lab`. Two separately confirmed grants reconciled to PHP 100,000 with four zero-sum postings; the resulting non-zero response exposed and prompted a fix for Flutter's stale zero-only account parser.
 

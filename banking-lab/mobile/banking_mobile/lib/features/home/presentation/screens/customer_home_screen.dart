@@ -74,7 +74,8 @@ class CustomerHomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: KkSpacing.lg),
-            if (state.isAuthenticated) const AccountCard(),
+            if (state.isAuthenticated)
+              AccountCard(onTransfer: () => context.push('/transfer')),
             const SizedBox(height: KkSpacing.lg),
             KkEmbossedButton(
               onPressed: state.isSubmitting

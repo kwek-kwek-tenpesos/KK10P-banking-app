@@ -5,6 +5,7 @@ namespace Banking.Api.Features.Ledger;
 public sealed class LedgerTransaction
 {
     public const string DevelopmentFundingOperation = "DEVELOPMENT_FUNDING";
+    public const string InternalTransferOperation = "INTERNAL_TRANSFER";
     public const string InitiatorIdempotencyIndex = "IX_LedgerTransactions_InitiatedByUserId_IdempotencyKey";
 
     public Guid Id { get; set; } = Guid.NewGuid();

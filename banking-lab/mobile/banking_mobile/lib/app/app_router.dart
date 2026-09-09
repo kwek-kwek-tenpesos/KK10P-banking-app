@@ -9,6 +9,7 @@ import 'package:banking_mobile/features/home/presentation/screens/customer_home_
 import 'package:banking_mobile/features/material_proof/presentation/screens/material_proof_screen.dart';
 import 'package:banking_mobile/features/onboarding/presentation/screens/welcome_screen.dart';
 import 'package:banking_mobile/features/system_info/presentation/screens/system_info_screen.dart';
+import 'package:banking_mobile/features/transfers/presentation/screens/internal_transfer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,7 +41,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location == '/welcome' ||
           location == '/login' ||
           location == '/register';
-      final isProtected = location == '/home';
+      final isProtected = location == '/home' || location == '/transfer';
 
       if (auth.status == AuthenticationStatus.initializing ||
           !preferences.isReady) {
@@ -89,6 +90,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const CustomerHomeScreen(),
+      ),
+      GoRoute(
+        path: '/transfer',
+        builder: (context, state) => const InternalTransferScreen(),
       ),
       GoRoute(
         path: '/material-proof',

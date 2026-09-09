@@ -15,11 +15,13 @@ import 'package:banking_mobile/features/authentication/data/models/registration_
 import 'package:banking_mobile/features/authentication/data/services/authentication_api_service.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
+import 'package:banking_mobile/features/transfers/data/storage/pending_internal_transfer_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'features/accounts/account_test_support.dart';
+import 'features/transfers/transfer_test_support.dart';
 import 'support/memory_app_preferences_store.dart';
 
 void main() {
@@ -221,6 +223,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('PHP 0.00'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Transfer funds'));
+    await tester.tap(find.text('Transfer funds'));
+    await tester.pumpAndSettle();
+    expect(find.text('Transfer simulator funds'), findsOneWidget);
+    expect(find.text('Recipient account reference'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Hello, Chris'), findsOneWidget);
+
     await tester.ensureVisible(find.widgetWithText(OutlinedButton, 'Sign out'));
     await tester.tap(find.widgetWithText(OutlinedButton, 'Sign out'));
     await tester.pumpAndSettle();
@@ -310,6 +321,9 @@ Widget _testApp({
       authenticationApiServiceProvider.overrideWithValue(api),
       accountsApiServiceProvider.overrideWithValue(
         accounts ?? StubAccountsApi(),
+      ),
+      pendingInternalTransferStoreProvider.overrideWithValue(
+        MemoryPendingTransferStore(),
       ),
       systemInfoProvider.overrideWith(
         (ref) async => SystemInfo(

@@ -1,7 +1,7 @@
 # Customer Accounts and Balances Delivery
 
 - Date: 2026-09-06.
-- Status: Code, database-free checks, disposable PostgreSQL verification, backed-up shared schema rollout, physical customer-A and remote customer-B ownership journeys are complete. TalkBack listening remains pending.
+- Status: Code, database-free checks, disposable PostgreSQL verification, backed-up shared schema rollout, physical customer-A and remote customer-B ownership journeys, 200% text, and later TalkBack listening are complete.
 - Approved behavior: One PHP simulator account per customer, opened explicitly at PHP 0.00; funding/transfers separate.
 - Canonical behavior: [accounts contract](../04_Architecture/customer-accounts-contract.md).
 - Current execution and approvals: [task.md](../01_Tracking/task.md).
@@ -55,7 +55,7 @@
 | Account-card widget states | Unopened/loaded/error at 320, 360, 412 and 768 logical-pixel widths, with 200% text scaling; no overflow. Button size and focus/tap semantics checked. |
 | Migration generation and SQL script generation | Succeeded and was reviewed before the later approved rollout. Forward SQL creates CustomerAccounts, its constraints and unique index, then records the migration in EF history. |
 | Physical customer-A and remote customer-B paths | Chris passed in-place APK diagnostics, registration/confirmation, login, unopened state, opening, persistence, API-outage Retry and logout. Gio's screenshots plus PostgreSQL proved a separate owner/account. |
-| Physical accessibility sample | At 200% system text, the long reference wrapped and Refresh/Sign out remained reachable by scrolling; the original 1.0 scale was restored. TalkBack spoken order remains pending. |
+| Physical accessibility sample | At 200% system text, the long reference wrapped and Refresh/Sign out remained reachable by scrolling; the original 1.0 scale was restored. Chris later confirmed TalkBack worked across the tested flow. |
 | Targeted whitespace and documentation checks | Completed at handoff; see task.md for final status. |
 
 The first accessibility test run failed because of test semantics-handle cleanup and a missing expected focus action. The harness was corrected; the final full suite passed. Review also corrected first-create timestamp precision and preserved logout's ability to revoke a rotated token whose secure write was pending. Tests cover pending refresh/secure writes, cross-login late results, final account 401, and logout while an account request is pending.
@@ -104,10 +104,10 @@ Gio's first screenshot showed his display name and the explicit unopened card, w
 
 ### Remaining physical checks
 
-- TalkBack spoken reading order requires Chris to listen on the device. XML/semantics inspection and widget focus tests cannot truthfully substitute for that human check.
+- TalkBack spoken behavior was later confirmed by Chris on the physical device; XML/semantics inspection and widget focus tests remained supporting automated evidence rather than a substitute for that check.
 - A deliberately delayed in-flight request was not injected into the shared runtime. The widget suite covers logout while an account request is pending; physical testing covered ordinary server-backed logout, restart isolation and the separate outage/Retry state.
 - `app_config.dart` still uses old HTTP/LAN examples in configuration-error copy. The working remote flow uses the private HTTPS Serve hostname; correct those examples in a separately reviewed code change so future testers are not misled.
 
 ## Focused security review
 
-Reviewed the new account endpoints/query filters, request guards, minimal DTOs, migrations, mobile token handling, redirect policy, error paths and session/storage races. No unresolved high/critical finding was identified within this source-review scope. That is not a full repository audit or a ZAP result. TalkBack listening remains the only unobserved physical check.
+Reviewed the new account endpoints/query filters, request guards, minimal DTOs, migrations, mobile token handling, redirect policy, error paths and session/storage races. No unresolved high/critical finding was identified within this source-review scope. That is not a full repository audit or a ZAP result.

@@ -1,7 +1,7 @@
 # Slice 4 Walkthrough: Ledger and Development Funding
 
 - Date: 2026-09-09.
-- Delivery state: Code complete; database-free, Flutter, migration-shape, fresh disposable PostgreSQL, verified backup, shared rollout, and authenticated funding reconciliation passed. Corrected non-zero Home rendering awaits one physical refresh check.
+- Delivery state: Completed and physically verified by Chris and Gio; database-free, Flutter, migration-shape, fresh disposable PostgreSQL, verified backup, shared rollout, authenticated funding reconciliation, and corrected non-zero Home rendering all passed.
 - Contract: [ledger and Development funding](../04_Architecture/ledger-development-funding-contract.md).
 - Plan: [Slice 4](../02_Planning/plan-kk10p-slice-4-ledger-development-funding.md).
 
@@ -129,6 +129,8 @@ The fixture refuses an already migrated database and never resets/drops one. Rep
 | Shared `banking_lab` rollout | Exact migration applied after verified backup; 4 users, 25 sessions, 52 refresh-token rows and 2 zero-balance accounts initially preserved |
 | Authenticated funding | Two separately confirmed grants about 59 seconds apart produced 2 transactions, 4 balanced postings and PHP 100,000 on one account; the other account remained zero |
 | Non-zero Home regression | Flutter's stale zero-only parser was corrected; focused account tests and the complete 177-test suite pass with clean analysis |
+| Final physical verification | Chris confirmed the corrected Home balance and funding behavior; Gio independently verified the second-customer flow |
+| Final shared reconciliation | 4 funding transactions, 8 postings, PHP 200,000 total across two accounts, and a zero posting sum |
 
 The first disposable run had one test-order assertion that expected the entire shared fixture to remain empty while other tests had already created isolated customer transactions. The implementation passed; the assertion was narrowed to the pre-existing upgrade account/user, the exact disposable test database was explicitly verified, dropped, recreated, and the corrected 4/4 run passed. Only `banking_lab_ledger_test` was reset; shared `banking_lab` was untouched.
 
@@ -165,7 +167,7 @@ For a fresh account/day, the complete physical checklist is:
 9. Check Light/Dark, 200% text, scrolling, focus, and TalkBack wording/order.
 10. Repeat on Gio's separately authenticated account and verify neither customer sees or changes the other's account.
 
-During the first shared test, Chris confirmed the funding action twice after the first request had completed. Both confirmations therefore received different UUID keys and correctly created the two grants allowed by policy; this was not a same-request duplicate. The journal reconciled to PHP 100,000 and the daily cap is now reached. Home initially rejected the valid non-zero account response because `AccountSummary.fromJson` still enforced the earlier zero-only contract. The parser now accepts canonical non-negative signed-64-bit integer strings and formats the result as `PHP 100,000.00`; negative, decimal, signed, leading-zero, and overflow inputs still fail closed.
+During the first shared test, Chris confirmed the funding action twice after the first request had completed. Both confirmations therefore received different UUID keys and correctly created the two grants allowed by policy; this was not a same-request duplicate. Home initially rejected the valid non-zero account response because `AccountSummary.fromJson` still enforced the earlier zero-only contract. The parser now accepts canonical non-negative signed-64-bit integer strings and formats the result as `PHP 100,000.00`; negative, decimal, signed, leading-zero, and overflow inputs still fail closed. Chris then physically confirmed the corrected Home state, and Gio independently completed the second-customer verification. The final read-only shared reconciliation found four funding transactions, eight postings, PHP 200,000 total across both accounts, and a zero posting sum.
 
 ## Deferred follow-ups
 

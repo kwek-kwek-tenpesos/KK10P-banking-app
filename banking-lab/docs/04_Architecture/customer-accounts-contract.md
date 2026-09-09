@@ -1,7 +1,7 @@
 # Customer Accounts and Balances Contract
 
-- Status: Implemented; database-free backend, Flutter, disposable PostgreSQL, backed-up shared schema rollout, physical customer-A and remote customer-B ownership journeys passed on 2026-09-06. TalkBack listening remains pending.
-- Scope: One explicitly opened PHP simulator account per customer, starting at PHP 0.00. Funding, transfers, ledger postings, transaction history, account closure and multiple accounts remain future work.
+- Status: Implemented; backend, Flutter, disposable PostgreSQL, backed-up shared schema rollout, two-customer ownership, TalkBack, non-zero Home rendering, and ledger-backed Development funding are verified through 2026-09-09.
+- Scope: One explicitly opened PHP simulator account per customer, starting at PHP 0.00 and later holding non-negative ledger-backed fake funds. The internal-transfer API is implemented as an unapplied Slice 5 candidate; its Flutter journey, transaction history, account closure and multiple accounts remain future work.
 - Session policy: [customer authentication contract](customer-authentication-contract.md).
 - Delivery evidence and pending manual steps: [walkthrough](../03_Walkthroughs/walkthrough-accounts-and-balances.md).
 
@@ -47,11 +47,9 @@ GET performs no account writes. PUT inserts a server-generated UUID, validated o
 - `IX_CustomerAccounts_UserId`: unique owner index.
 - `FK_CustomerAccounts_AspNetUsers_UserId`: references identity with restricted deletion.
 - `CK_CustomerAccounts_Currency`: currency equals PHP.
-- `CK_CustomerAccounts_ZeroBalance`: balance equals zero.
+- `CK_CustomerAccounts_NonnegativeBalance`: balance is greater than or equal to zero.
 
-Migration `20260906042449_AddCustomerAccounts` adds this table/index/constraints only; existing identity/session tables are unchanged. It contains no seeds, backfill or automatic opening. It passed the disposable `banking_lab_accounts_test` fixture and was then applied to the separately approved, backed-up shared `banking_lab` database. Shared post-checks found zero account rows and unchanged identity/session/token counts. App startup does not apply migrations automatically.
-
-The currently deployed shared schema still permits zero only. The reviewed Slice 4 source and unapplied migration transition this to a non-negative snapshot backed by balanced, append-only journal postings; see the [ledger and Development funding contract](ledger-development-funding-contract.md). Until that migration receives separate rollout approval, no funds have been issued and the shared runtime remains at zero. An editable balance field is never a substitute for ledger authority, reconciliation, and concurrency control.
+Migration `20260906042449_AddCustomerAccounts` originally added the table with a zero-only balance constraint and no seeds, backfill, or automatic opening. The separately reviewed and deployed migration `20260908124011_AddLedgerAndDevelopmentFunding` replaced that check with the current non-negative constraint and added the balanced, append-only journal; see the [ledger and Development funding contract](ledger-development-funding-contract.md). Existing identity/session/account data was preserved through both backed-up shared rollouts, and app startup still does not apply migrations automatically. An editable balance field is never a substitute for ledger authority, reconciliation, and concurrency control.
 
 The Down migration drops CustomerAccounts and would lose its data after use. Prefer reverting application code while retaining the additive table; schema/data rollback requires separate approval and a reviewed backup path.
 
@@ -74,4 +72,4 @@ Requests use `getValidAccessToken`, reject insecure API origins before attaching
 
 Account state is scoped to the authenticated customer/session generation. Logout removes the customer from visible UI immediately. Pending account results from an old generation are discarded. Authentication operations also carry a generation, and secure-storage reads/writes/clears are serialized: logout waits for a pending rotation write, reads the latest refresh token for revocation, then clears it; a new login's clear/write cannot be overwritten by old work. Pending controller operations cannot restore an older UI state.
 
-No account data is persisted by the mobile feature. Logout/storage failures report uncertainty rather than falsely claiming that secure credentials were cleared. The card uses existing Material controls, the approved navy/orange/surface palette, a 48-pixel minimum action height, meaningful labels and explicit loading/error states.
+No account data is persisted by the mobile feature. Logout/storage failures report uncertainty rather than falsely claiming that secure credentials were cleared. The card uses the approved Light/Dark blue-accent neumorphic material, a 48-pixel minimum action height, meaningful labels and explicit loading/error states.

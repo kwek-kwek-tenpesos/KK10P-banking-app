@@ -4,10 +4,13 @@ import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
 import 'package:banking_mobile/features/accounts/data/models/account_summary.dart';
 import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AccountCard extends ConsumerStatefulWidget {
-  const AccountCard({super.key});
+  const AccountCard({super.key, this.onTransfer});
+
+  final VoidCallback? onTransfer;
 
   @override
   ConsumerState<AccountCard> createState() => _AccountCardState();
@@ -62,6 +65,8 @@ class _AccountCardState extends ConsumerState<AccountCard> {
               account: account,
               balanceVisible: _balanceVisible,
               onRefresh: controller.load,
+              onTransfer: widget.onTransfer,
+              onCopyReference: () => _copyReference(account.id),
             ),
             AccountStatus.loaded || AccountStatus.error => _AccountFailure(
               title: 'Couldn’t load account',
@@ -74,6 +79,29 @@ class _AccountCardState extends ConsumerState<AccountCard> {
         ],
       ),
     );
+  }
+
+  Future<void> _copyReference(String reference) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: reference));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Simulator account reference copied.')),
+        );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Couldn\u2019t copy the simulator account reference.',
+            ),
+          ),
+        );
+    }
   }
 }
 
@@ -217,11 +245,15 @@ class _LoadedAccount extends StatelessWidget {
     required this.account,
     required this.balanceVisible,
     required this.onRefresh,
+    required this.onTransfer,
+    required this.onCopyReference,
   });
 
   final AccountSummary account;
   final bool balanceVisible;
   final VoidCallback onRefresh;
+  final VoidCallback? onTransfer;
+  final VoidCallback onCopyReference;
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +291,25 @@ class _LoadedAccount extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
+        const SizedBox(height: KkSpacing.sm),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: onCopyReference,
+            icon: const Icon(Icons.copy_outlined),
+            label: const Text('Copy account reference'),
+          ),
+        ),
         const SizedBox(height: KkSpacing.lg),
+        if (onTransfer != null) ...[
+          KkEmbossedButton(
+            variant: KkEmbossedButtonVariant.primary,
+            onPressed: onTransfer,
+            icon: const Icon(Icons.send_outlined),
+            label: const Text('Transfer funds'),
+          ),
+          const SizedBox(height: KkSpacing.sm),
+        ],
         KkEmbossedButton(
           onPressed: onRefresh,
           icon: const Icon(Icons.refresh),

@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:banking_mobile/core/errors/api_error_mapper.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/identifiers/secure_uuid_v4.dart';
 import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
@@ -42,7 +41,7 @@ class DevelopmentFundingController
 
   Future<void> fund() async {
     if (state.busy || !mounted || !_isCurrent()) return;
-    _pendingKey ??= _newUuid();
+    _pendingKey ??= newSecureUuidV4();
     state = const DevelopmentFundingState(DevelopmentFundingStatus.submitting);
     try {
       final receipt = await _repository.fund(_pendingKey!);
@@ -72,19 +71,6 @@ class DevelopmentFundingController
         canRetrySameRequest: uncertain,
       );
     }
-  }
-
-  static String _newUuid() {
-    final random = Random.secure();
-    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    final value = bytes
-        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-        .join();
-    return '${value.substring(0, 8)}-${value.substring(8, 12)}-'
-        '${value.substring(12, 16)}-${value.substring(16, 20)}-'
-        '${value.substring(20)}';
   }
 }
 

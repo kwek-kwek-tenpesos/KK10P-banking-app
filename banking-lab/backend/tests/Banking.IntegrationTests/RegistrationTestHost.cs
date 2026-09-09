@@ -1,5 +1,6 @@
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
+using Banking.Api.Features.Transfers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -26,6 +27,7 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
     public RegistrationTestStore Store { get; } = new();
     public RecordingVerificationDelivery Delivery { get; } = new();
     public RegistrationTestLogger Log { get; } = new();
+    public InternalTransferTestLogger TransferLog { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -59,6 +61,7 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
             services.RemoveAll<ICustomerVerificationDelivery>();
             services.AddSingleton<ICustomerVerificationDelivery>(Delivery);
             services.AddSingleton<ILogger<CustomerRegistrationService>>(Log);
+            services.AddSingleton<ILogger<InternalTransferLog>>(TransferLog);
         });
     }
 
@@ -71,6 +74,20 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
             if (shouldFail()) throw new TimeoutException("Injected test persistence failure.");
             return ValueTask.FromResult(result);
         }
+    }
+}
+
+internal sealed class InternalTransferTestLogger : ILogger<InternalTransferLog>
+{
+    public List<string> Messages { get; } = [];
+    public List<Exception> Exceptions { get; } = [];
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+    public bool IsEnabled(LogLevel logLevel) => true;
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
+        Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        Messages.Add(formatter(state, exception));
+        if (exception is not null) Exceptions.Add(exception);
     }
 }
 

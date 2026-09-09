@@ -10,6 +10,24 @@ namespace Banking.IntegrationTests;
 public sealed class LedgerMigrationTests
 {
     [Fact]
+    public void InternalTransferMigrationOnlyWidensTheOperationConstraint()
+    {
+        var migration = new AddInternalTransfers();
+        Assert.Empty(migration.UpOperations.OfType<CreateTableOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DropTableOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DeleteDataOperation>());
+        Assert.Empty(migration.UpOperations.OfType<UpdateDataOperation>());
+        Assert.Empty(migration.UpOperations.OfType<AddColumnOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DropColumnOperation>());
+        Assert.Empty(migration.UpOperations.OfType<AlterColumnOperation>());
+        Assert.Single(migration.UpOperations.OfType<DropCheckConstraintOperation>(), operation =>
+            operation.Name == "CK_LedgerTransactions_Operation");
+        Assert.Single(migration.UpOperations.OfType<AddCheckConstraintOperation>(), operation =>
+            operation.Name == "CK_LedgerTransactions_Operation" &&
+            operation.Sql == "\"Operation\" IN ('DEVELOPMENT_FUNDING', 'INTERNAL_TRANSFER')");
+    }
+
+    [Fact]
     public void ForwardMigrationIsAdditiveApartFromReplacingTheZeroBalanceCheck()
     {
         var migration = new AddLedgerAndDevelopmentFunding();
@@ -42,6 +60,21 @@ public sealed class LedgerMigrationTests
         Assert.Contains("CREATE TABLE \"LedgerTransactions\"", sql);
         Assert.Contains("CREATE TABLE \"LedgerPostings\"", sql);
         Assert.Contains("CK_CustomerAccounts_NonnegativeBalance", sql);
+        Assert.DoesNotContain("UPDATE \"", sql);
+        Assert.DoesNotContain("DELETE FROM", sql);
+        Assert.False(context.Database.HasPendingModelChanges());
+    }
+
+    [Fact]
+    public void InternalTransferSqlOnlyReplacesTheOperationConstraintAndHasNoModelDrift()
+    {
+        using var context = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseNpgsql().Options);
+        var sql = context.GetService<IMigrator>().GenerateScript(
+            "20260908124011_AddLedgerAndDevelopmentFunding", "20260909065721_AddInternalTransfers");
+        Assert.Contains("DROP CONSTRAINT \"CK_LedgerTransactions_Operation\"", sql);
+        Assert.Contains("CHECK (\"Operation\" IN ('DEVELOPMENT_FUNDING', 'INTERNAL_TRANSFER'))", sql);
+        Assert.DoesNotContain("CREATE TABLE", sql);
+        Assert.DoesNotContain("DROP TABLE", sql);
         Assert.DoesNotContain("UPDATE \"", sql);
         Assert.DoesNotContain("DELETE FROM", sql);
         Assert.False(context.Database.HasPendingModelChanges());

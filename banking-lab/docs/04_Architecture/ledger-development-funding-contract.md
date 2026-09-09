@@ -96,6 +96,6 @@ Migration `20260908124011_AddLedgerAndDevelopmentFunding`:
 
 Its Down operation drops all journal rows and can only restore the zero-only account check when every balance is zero. After any funding, application rollback should retain the additive schema. Database rollback/recovery is destructive and requires a separate reviewed decision and verified backup.
 
-## Future transfer rule
+## Internal transfer extension
 
-Slice 5 is planned to allow at most PHP 50,000 per internal transfer and PHP 100,000 aggregate outgoing per source account per Philippine day. Incoming money, Development funding, and idempotent replays do not consume that outgoing allowance. Transfer implementation remains unapproved and absent.
+The implemented [Slice 5 internal-transfer contract](internal-transfer-contract.md) retains the approved PHP 50,000 per-transfer and PHP 100,000 aggregate outgoing-per-source-account Philippine-day rules. Incoming money, Development funding, rejected attempts, and idempotent replays do not consume that outgoing allowance. Source/destination movements reuse the journal as one balanced customer posting pair. Migration `20260909065721_AddInternalTransfers` widens only the operation check constraint; it is fresh-database verified but remains unapplied to shared `banking_lab`, and no live transfer or Flutter Transfer UI exists yet.

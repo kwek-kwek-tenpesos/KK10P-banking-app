@@ -82,6 +82,24 @@ public sealed class CustomerSessionTests
         Assert.Equal(HttpStatusCode.NoContent, repeated.StatusCode);
     }
 
+    [Theory]
+    [InlineData("John Doe OR 1=1 -- ")]
+    [InlineData("John Doe AND 1=1 -- ")]
+    public async Task Logout_WithInjectionShapedUnknownToken_DoesNotRevokeExistingSession(string candidate)
+    {
+        using var host = new RegistrationTestHost();
+        var user = await SeedAsync(host.Services);
+        using var client = host.CreateClient();
+        var login = await LoginAsync(client, user.Email!);
+
+        using var logout = await client.PostAsJsonAsync("/api/v1/auth/logout", new { refreshToken = candidate });
+
+        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, await MeAsync(client, login.AccessToken));
+        using var refresh = await client.PostAsJsonAsync("/api/v1/auth/refresh", new { login.RefreshToken });
+        Assert.Equal(HttpStatusCode.OK, refresh.StatusCode);
+    }
+
     [Fact]
     public async Task ReplayRevokesOnlyItsSession()
     {

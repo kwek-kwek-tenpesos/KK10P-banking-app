@@ -7,6 +7,7 @@ import 'package:banking_mobile/features/accounts/presentation/controllers/accoun
 import 'package:banking_mobile/features/accounts/presentation/widgets/account_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'account_test_support.dart';
@@ -157,6 +158,38 @@ void main() {
       expect(find.text(unsupported), findsNothing);
     }
   });
+
+  testWidgets('loaded account exposes working transfer and copy actions', (
+    tester,
+  ) async {
+    final repo = StubAccountsRepository()..onRead = () async => sampleAccount;
+    var transfers = 0;
+    Object? clipboardArguments;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          clipboardArguments = call.arguments;
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+    await _pumpAccountCard(tester, repo: repo, onTransfer: () => transfers++);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Transfer funds'));
+    expect(transfers, 1);
+    await tester.tap(find.text('Copy account reference'));
+    await tester.pumpAndSettle();
+    expect(clipboardArguments, {'text': sampleAccount.id});
+    expect(find.text('Simulator account reference copied.'), findsOneWidget);
+  });
 }
 
 Future<void> _pumpAccountCard(
@@ -165,6 +198,7 @@ Future<void> _pumpAccountCard(
   double width = 412,
   double textScale = 1,
   ThemeData? theme,
+  VoidCallback? onTransfer,
 }) async {
   tester.view.physicalSize = Size(width, 1200);
   tester.view.devicePixelRatio = 1;
@@ -184,10 +218,10 @@ Future<void> _pumpAccountCard(
             size: Size(width, 1200),
             textScaler: TextScaler.linear(textScale),
           ),
-          child: const Scaffold(
+          child: Scaffold(
             body: SingleChildScrollView(
-              padding: EdgeInsets.all(KkSpacing.lg),
-              child: AccountCard(),
+              padding: const EdgeInsets.all(KkSpacing.lg),
+              child: AccountCard(onTransfer: onTransfer),
             ),
           ),
         ),

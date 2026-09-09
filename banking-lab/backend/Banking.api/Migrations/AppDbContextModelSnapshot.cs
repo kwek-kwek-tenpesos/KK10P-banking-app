@@ -329,7 +329,7 @@ namespace Banking.api.Migrations
 
                             t.HasCheckConstraint("CK_LedgerTransactions_NonnegativeBalance", "\"BalanceAfterMinor\" >= 0");
 
-                            t.HasCheckConstraint("CK_LedgerTransactions_Operation", "\"Operation\" = 'DEVELOPMENT_FUNDING'");
+                            t.HasCheckConstraint("CK_LedgerTransactions_Operation", "\"Operation\" IN ('DEVELOPMENT_FUNDING', 'INTERNAL_TRANSFER')");
                         });
                 });
 

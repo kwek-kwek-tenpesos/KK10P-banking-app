@@ -10,6 +10,7 @@ This is the canonical current contract for the customer registration, verificati
 
 - Flutter is an untrusted client. The ASP.NET Core API owns identity validation, email confirmation, lockout, session deadlines, token rotation and revocation.
 - Credential-bearing endpoints reject plain HTTP. Development phone traffic must reach the API through a trusted HTTPS reverse proxy.
+- API responses declare `Cross-Origin-Resource-Policy: same-site`. Secure non-Development/non-Testing responses also declare one-year HSTS; Development deliberately avoids persistent HSTS state on disposable local hosts.
 - Forwarded scheme/address headers are accepted only from exact IPv4 or IPv6 loopback proxies, with one forwarded hop. Do not broaden this list to a subnet and do not enable the unsafe forwarded-header environment switch.
 - Tailscale Serve is the intended development proxy: tailnet HTTPS terminates at Tailscale and the proxy target stays `http://127.0.0.1:5255`.
 - The JWT signing key belongs in .NET user-secrets or a deployment secret store. Access tokens remain memory-only in Flutter; only the rotating refresh token is stored through `flutter_secure_storage`.

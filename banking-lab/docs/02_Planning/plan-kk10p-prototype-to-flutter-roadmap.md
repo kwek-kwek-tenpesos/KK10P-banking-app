@@ -286,7 +286,7 @@ RETURN no-store response
 
 ```text
 Recipient reference
-  -> amount and optional short note
+  -> exact PHP amount
   -> review
   -> submit/processing
   -> success receipt or recoverable/definitive failure
@@ -303,11 +303,12 @@ Recipient reference
 
 ### Acceptance criteria
 
-- [ ] No transfer action is exposed until the backend contract is available.
-- [ ] Amount parsing uses integer minor units without floating point.
-- [ ] Duplicate taps send at most one logical transfer through idempotency.
-- [ ] Success, insufficient funds, unknown recipient, offline, timeout uncertainty and server failure are distinguishable.
-- [ ] A successful transfer refreshes affected account and activity state.
+- [x] No transfer action is exposed until the backend contract is available.
+- [x] Amount parsing uses integer minor units without floating point.
+- [x] Duplicate taps send at most one logical transfer through idempotency.
+- [x] An unresolved request retains its exact key and payload across route disposal or app restart so uncertainty is reconciled safely.
+- [x] Success, insufficient funds, unknown recipient, offline, timeout uncertainty and server failure are distinguishable.
+- [x] A successful transfer refreshes account state; Activity invalidation is connected when Slice 7 adds its provider.
 - [ ] The journey is usable at 320 pixels and 200% text with TalkBack.
 
 ## 11. Slice 7 — Activity, History and Receipt

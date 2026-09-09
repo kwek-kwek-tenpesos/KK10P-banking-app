@@ -34,13 +34,19 @@ AppFailure mapApiError(Object error) {
 AppFailure _mapBadResponse(Response<dynamic>? response) {
   final statusCode = response?.statusCode;
   final data = response?.data;
+  final requestId = _requestId(response);
 
   if (statusCode == 401) {
     return const UnauthenticatedFailure();
   }
 
   if (statusCode == 429) {
-    return const RateLimitedFailure();
+    return RateLimitedFailure(
+      retryAfterSeconds: int.tryParse(
+        response?.headers.value('retry-after') ?? '',
+      ),
+      requestId: requestId,
+    );
   }
 
   if (statusCode == 400 && data is Map<String, dynamic>) {
@@ -60,8 +66,23 @@ AppFailure _mapBadResponse(Response<dynamic>? response) {
       }
     }
 
-    return ValidationFailure(detail, fieldErrors: fieldErrors);
+    return ValidationFailure(
+      detail,
+      fieldErrors: fieldErrors,
+      requestId: requestId,
+    );
   }
 
-  return ServerFailure(statusCode: statusCode);
+  return ServerFailure(statusCode: statusCode, requestId: requestId);
+}
+
+String? _requestId(Response<dynamic>? response) {
+  final header = response?.headers.value('x-request-id')?.trim();
+  if (header != null && header.isNotEmpty) return header;
+  final data = response?.data;
+  if (data is Map) {
+    final traceId = data['traceId']?.toString().trim();
+    if (traceId != null && traceId.isNotEmpty) return traceId;
+  }
+  return null;
 }
