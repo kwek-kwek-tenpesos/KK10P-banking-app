@@ -2,12 +2,12 @@
 
 Template Version: Docs_ProjectWorkflowStarterKit_v2.0
 
-- Status: Approved and implemented; automated verification passed and Gate 6R shared migration completed on 2026-09-10, while the small live phone transfer remains manual
+- Status: Complete; automated verification, Gate 6R, Chris↔Gio real-device transfers, balance reconciliation, and rapid auto-clicker duplicate suppression passed on 2026-09-10
 - Scope Mode: New Feature — Flutter-first customer journey over the already-implemented internal-transfer API
 - Parent Roadmap: [KK10P prototype-to-Flutter roadmap](plan-kk10p-prototype-to-flutter-roadmap.md)
 - Authoritative Contract: [Internal transfer](../04_Architecture/internal-transfer-contract.md)
 - Visual Reference Only: `D:\OtherProjects\Banking-UI-UX-Prototype`
-- Shared-State Gate: the reviewed `20260909065721_AddInternalTransfers` migration is still unapplied to shared `banking_lab`; plan approval does not authorize that migration or a live transfer
+- Shared-State Gate: completed under separate Gate 6R approval; the shared schema and four intentional test transfers were reconciled without malformed journals or balance creation/loss
 
 Notice: Update this plan in place while it is under review. After approval, track execution in `../01_Tracking/task.md` and do not re-read this full plan unless its architecture or scope changes.
 
@@ -67,7 +67,7 @@ The Kotlin prototype supplies composition ideas—clear step identity, focused c
 | Account state already uses `BigInt`, session-generation guards, and one refresh after success | Transfer should follow these patterns and invalidate `accountControllerProvider` after confirmation. |
 | GoRouter currently protects only `/home` | `/transfer` must join the protected-route set and redirect a signed-out deep link to `/login`. |
 | Home intentionally contains no unsupported Transfer action yet | The new action is added only with the working journey; it must never be a dead button. |
-| The shared database lacks the Slice 5 constraint migration | Automated Flutter work can proceed with fakes, but real-device submission must wait for the separately approved migration rollout. |
+| At planning time, the shared database lacked the Slice 5 constraint migration | Automated Flutter work proceeded with fakes; the separately approved Gate 6R later resolved this prerequisite before real-device submission. |
 
 ### API compatibility matrix
 
@@ -333,47 +333,47 @@ No backend source, migration, PostgreSQL row, Kotlin prototype file, dependency 
 
 ### Functional
 
-- [ ] Only an authenticated customer with a loaded open account can reach the Transfer journey.
-- [ ] Home exposes a working `Transfer funds` action and an accessible `Copy account reference` action only in the loaded state.
-- [ ] The journey contains Recipient, Amount, and Review steps plus honest processing/result states; it contains none of the excluded prototype features.
-- [ ] Recipient input is normalized/validated as a canonical UUID and rejects blank, zero, malformed, and visible self-reference values before review.
-- [ ] Amount input uses exact integer-string arithmetic, supports one/two decimal digits, and never uses floating point.
-- [ ] Client validation enforces PHP 0.01–50,000.00 and currently visible balance; the text explains the server-authoritative PHP 100,000 Philippine-day limit.
-- [ ] The service sends exactly two JSON fields and accepts only strict `201`/`200` receipts.
-- [ ] Receipt content comes entirely from the server response and clearly says the money is simulated.
+- [x] Only an authenticated customer with a loaded open account can reach the Transfer journey.
+- [x] Home exposes a working `Transfer funds` action and an accessible `Copy account reference` action only in the loaded state.
+- [x] The journey contains Recipient, Amount, and Review steps plus honest processing/result states; it contains none of the excluded prototype features.
+- [x] Recipient input is normalized/validated as a canonical UUID and rejects blank, zero, malformed, and visible self-reference values before review.
+- [x] Amount input uses exact integer-string arithmetic, supports one/two decimal digits, and never uses floating point.
+- [x] Client validation enforces PHP 0.01–50,000.00 and currently visible balance; the text explains the server-authoritative PHP 100,000 Philippine-day limit.
+- [x] The service sends exactly two JSON fields and accepts only strict `201`/`200` receipts.
+- [x] Receipt content comes entirely from the server response and clearly says the money is simulated.
 
 ### Idempotency and recovery
 
-- [ ] Ten rapid confirmation taps produce one request and one idempotency key.
-- [ ] The pending envelope is durably stored before the first network dispatch; a storage failure sends nothing.
-- [ ] Network, timeout, cancellation-after-dispatch, `500`, `503`, and invalid success data retain the exact key/payload and show `status unconfirmed`.
-- [ ] Controller recreation/app restart for the same customer restores the unresolved request and reconciles it with the same POST.
-- [ ] A different authenticated customer cannot see or submit another customer's stored pending request.
-- [ ] A confirmed success or definitive business/input failure clears the pending envelope; `429` may retain it for a deliberate same-key retry or safe cancellation because the route guard did not execute the transfer.
-- [ ] Failure to clear safely blocks a new logical transfer until cleanup succeeds; a corrupt pending marker is never silently discarded.
-- [ ] `200 replayed` resolves as one confirmed earlier request, not a new transfer.
+- [x] Rapid confirmation taps, including the physical-device auto-clicker check, produce one request and one idempotency key.
+- [x] The pending envelope is durably stored before the first network dispatch; a storage failure sends nothing.
+- [x] Network, timeout, cancellation-after-dispatch, `500`, `503`, and invalid success data retain the exact key/payload and show `status unconfirmed`.
+- [x] Controller recreation/app restart for the same customer restores the unresolved request and reconciles it with the same POST.
+- [x] A different authenticated customer cannot see or submit another customer's stored pending request.
+- [x] A confirmed success or definitive business/input failure clears the pending envelope; `429` may retain it for a deliberate same-key retry or safe cancellation because the route guard did not execute the transfer.
+- [x] Failure to clear safely blocks a new logical transfer until cleanup succeeds; a corrupt pending marker is never silently discarded.
+- [x] `200 replayed` resolves as one confirmed earlier request, not a new transfer.
 
 ### Errors, auth, and privacy
 
-- [ ] Unknown recipient, self-transfer, insufficient funds, daily limit, account-not-opened, idempotency conflict, rate limit, authentication loss, and uncertain server/network states are distinguishable.
-- [ ] One bearer refresh may retry the identical request; a final `401` invalidates the customer session.
-- [ ] Late responses cannot populate UI after logout/customer change.
-- [ ] No recipient personal data, bearer/refresh token, idempotency key, body, amount, or full account references are newly logged.
-- [ ] The UI never claims real banking rails, regulatory protection, encryption strength, fees, recipient identity, or settlement facts not in the contract.
+- [x] Unknown recipient, self-transfer, insufficient funds, daily limit, account-not-opened, idempotency conflict, rate limit, authentication loss, and uncertain server/network states are distinguishable.
+- [x] One bearer refresh may retry the identical request; a final `401` invalidates the customer session.
+- [x] Late responses cannot populate UI after logout/customer change.
+- [x] No recipient personal data, bearer/refresh token, idempotency key, body, amount, or full account references are newly logged.
+- [x] The UI never claims real banking rails, regulatory protection, encryption strength, fees, recipient identity, or settlement facts not in the contract.
 
 ### Design and accessibility
 
-- [ ] Light/dark modes use the approved KK10P pure-neumorphic material without global theme changes or orange accents.
-- [ ] Every screen has one visually primary action; fields, cards, selected steps, and pressed/loading states remain visually distinguishable.
-- [ ] The journey is scroll-safe at 320 logical pixels and 200% text with no clipped amount, UUID, error, or action.
-- [ ] TalkBack announces step, field purpose/error, current balance, submit warning, processing, unconfirmed status, and receipt in a coherent order.
-- [ ] Touch targets are at least 48 logical pixels, keyboard focus advances logically, and the first invalid field receives focus.
+- [x] Light/dark modes use the approved KK10P pure-neumorphic material without global theme changes or orange accents.
+- [x] Every screen has one visually primary action; fields, cards, selected steps, and pressed/loading states remain visually distinguishable.
+- [x] The journey is scroll-safe at 320 logical pixels and 200% text with no clipped amount, UUID, error, or action.
+- [x] TalkBack announces step, field purpose/error, current balance, submit warning, processing, unconfirmed status, and receipt in a coherent order.
+- [x] Touch targets are at least 48 logical pixels, keyboard focus advances logically, and the first invalid field receives focus.
 
 ### Rollout boundary
 
-- [ ] Flutter unit/widget work performs no write to shared `banking_lab`.
-- [ ] No real-device submit occurs before separate migration approval, fresh backup, exact migration application, and post-migration reconciliation.
-- [ ] Chris/Gio phone verification confirms sender debit and recipient credit; Activity/history is not claimed until Slice 7.
+- [x] Flutter unit/widget work performs no write to shared `banking_lab`.
+- [x] No real-device submit occurs before separate migration approval, fresh backup, exact migration application, and post-migration reconciliation.
+- [x] Chris/Gio phone verification confirms sender debit and recipient credit; Activity/history is not claimed until Slice 7.
 
 ## 9. Automated Verification Plan
 
@@ -441,4 +441,4 @@ Approval of this plan authorizes only the planned Flutter source/tests/documenta
 - an authenticated live ZAP scan;
 - Git staging, commit, push, branch switching, or pull-request actions.
 
-After plan approval, implement through automated Flutter verification first. Before the first phone submission, stop at Gate 6R and request the separate shared-migration approval.
+This order was completed as designed: automated Flutter verification finished first, Gate 6R separately backed up and migrated shared `banking_lab`, and only then did Chris and Gio perform the reconciled physical-device acceptance run.

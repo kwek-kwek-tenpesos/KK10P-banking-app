@@ -1,6 +1,6 @@
 # Internal Fake-Money Transfer Contract
 
-- Status: Implemented and verified; migration `20260909065721_AddInternalTransfers` was safely applied to shared `banking_lab` under Gate 6R on 2026-09-10. No live transfer has been executed yet.
+- Status: Implemented, migrated, and real-device verified. Gate 6R safely applied `20260909065721_AddInternalTransfers`, and the reconciled Chris↔Gio acceptance run passed on 2026-09-10.
 - Plan: [Slice 5](../02_Planning/plan-kk10p-slice-5-internal-transfer-api.md).
 - Delivery guide: [Slice 5 walkthrough](../03_Walkthroughs/walkthrough-kk10p-slice-5-internal-transfer-api.md).
 
@@ -83,7 +83,7 @@ EF rejects ledger mutation, standalone postings, non-paired positions, currency/
 
 Migration `20260909065721_AddInternalTransfers` only replaces `CK_LedgerTransactions_Operation`. It adds no table/column, seed, backfill, account, balance update, or transfer. A fresh `banking_lab_transfer_test` upgrade preserved an existing funding record and passed transfer concurrency/constraint tests before that exact disposable database was removed.
 
-Gate 6R quiesced the API, created and catalog-validated a custom PostgreSQL backup, applied only that migration, and reconciled unchanged users, sessions, refresh tokens, accounts, balances, ledger rows, posting sum, and journal validity. The API then restarted and returned HTTP 200 from system info. No live Chris↔Gio transfer was executed by the rollout.
+Gate 6R quiesced the API, created and catalog-validated a custom PostgreSQL backup, applied only that migration, and reconciled unchanged users, sessions, refresh tokens, accounts, balances, ledger rows, posting sum, and journal validity. The API then restarted and returned HTTP 200 from system info. The rollout itself executed no transfer; the separately performed Chris↔Gio acceptance run later created four intentional, balanced test transfers.
 
 The Down migration cannot be used after an internal-transfer row exists because it narrows the operation constraint back to funding-only. Restore or data recovery after the first transfer therefore requires a separately reviewed recovery plan rather than `database update` to the prior migration.
 
@@ -95,4 +95,4 @@ Before dispatch, Flutter writes a versioned customer-scoped envelope containing 
 
 The repository uses the current access token, permits one refresh, and resends the identical envelope after refresh. A final authentication failure invalidates the local session without discarding an unresolved transfer. Late responses are guarded by the current customer/session generation. Successful completion refreshes Home account state. Slice 7 still owns persisted Activity/history lookup and historical receipts.
 
-The Flutter implementation is automated-verified and the shared schema is now ready. The first live device submission remains a manual Chris↔Gio verification step; it should use a deliberately small fake-PHP amount and reconcile both balances before Slice 6 is closed.
+The Flutter implementation, shared schema, and Chris↔Gio physical-device flow are verified. A manual rapid-tap and auto-clicker check produced one movement for one logical confirmation, and the post-test ledger reconciliation found no duplicate or malformed journal. Activity/history presentation remains a Slice 7 responsibility.

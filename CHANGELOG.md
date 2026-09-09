@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-10 — Slice 6 real-device transfer acceptance
+- Completed Chris↔Gio physical-device transfer verification, including an auto-clicker duplicate-submission check that moved PHP 1.00 once. Reconciled four intentional transfers with unique idempotency keys, two zero-sum postings each, no malformed journals, and an unchanged PHP 200,000.00 combined balance; interrupted-network recovery remains automated-test verified and Activity/history remains deferred to Slice 7.
+
 ### 2026-09-10 — Gate 6R shared internal-transfer rollout
 - Backed up and reconciled shared `banking_lab`, quiesced the API, applied only `20260909065721_AddInternalTransfers`, verified the widened two-operation check and unchanged users/accounts/balances/journal totals, then restarted the Development API with a successful read-only health check. No funding or transfer was executed; the small Chris↔Gio phone transfer remains manual.
 

@@ -1,7 +1,7 @@
 # Slice 6 Walkthrough: Flutter Internal Transfer Journey
 
 - Date: 2026-09-09.
-- Delivery state: Flutter candidate implemented and automated-verified; Gate 6R shared migration completed on 2026-09-10. The first small phone transfer remains manual.
+- Delivery state: Complete. Flutter automation, Gate 6R, Chris↔Gio physical-device transfers, shared-ledger reconciliation, and rapid auto-clicker duplicate suppression passed on 2026-09-10.
 - Plan: [Slice 6](../02_Planning/plan-kk10p-slice-6-flutter-internal-transfer-journey.md).
 - Contract: [internal transfer](../04_Architecture/internal-transfer-contract.md).
 
@@ -130,6 +130,14 @@ After Gate 6R succeeds:
 4. Refresh both Home screens. Activity/history is intentionally absent until Slice 7.
 5. At an agreed safe point, interrupt connectivity, restore it, choose the same-request recovery action, and confirm no duplicate debit.
 6. Capture any unclear TalkBack order, clipping, keyboard obstruction, or misleading success/error wording.
+
+## Completed real-device acceptance
+
+Chris and Gio confirmed the ordinary transfer journey, receipt, sender debit, recipient credit, and refreshed Home balances on physical devices. The final duplicate-submission check first used manual rapid tapping and then an auto-clicker. The auto-clicker attempt produced one PHP 1.00 movement.
+
+A read-only PostgreSQL reconciliation found four intentional internal transfers—PHP 12,000.00 and three separate PHP 1.00 transfers—with four distinct idempotency keys. Every transaction has exactly two postings with a zero sum, no malformed transaction exists, and the combined customer balance remains PHP 200,000.00.
+
+This closes the real-device Slice 6 acceptance boundary. Interrupted-connectivity same-key recovery remains covered by automated tests rather than a deliberately induced shared-device outage. Activity/history remains deferred to Slice 7.
 
 ## Deferred work
 
