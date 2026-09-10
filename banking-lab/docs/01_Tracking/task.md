@@ -31,6 +31,7 @@ Template Version: Docs_ProjectWorkflowStarterKit_v2.0
 
 - Backend: 279 passed, 0 failed, and 21 opt-in PostgreSQL tests skipped; no shared PostgreSQL test was enabled.
 - Flutter: formatting clean after normalization, analysis clean, and all 228 tests passed.
-- Android: debug APK assembled successfully. On this workstation, Kotlin incremental compilation had to be disabled for the clean build because the Pub cache is on `C:` and the project is on `D:`.
+- Android: debug APK assembled successfully. Kotlin incremental compilation is disabled in the Android project so ordinary Flutter builds remain deterministic when the Pub cache is on `C:` and the project is on `D:`.
+- Chris device build smoke: build `1.0.1` / code `2` installed in place on the Infinix, cold-launched to the Sign In screen in about 2.3 seconds, stayed running, and emitted no fatal Flutter/Android error. The device was signed out, so authenticated restoration and the remaining candidate checklist are still pending.
 - Runtime configuration: `ClientCompatibility:EnforcementEnabled` remains `false`; Gate 8A-R was not activated.
 - Data boundary: no migration, funding, transfer, or shared-database write was performed.

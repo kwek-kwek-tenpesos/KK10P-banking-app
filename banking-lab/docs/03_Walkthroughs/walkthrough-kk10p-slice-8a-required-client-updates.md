@@ -73,17 +73,18 @@ flutter build apk --debug
 
 Result: formatting and analysis are clean, and all 228 Flutter tests pass. The debug APK assembled successfully at `build/app/outputs/flutter-apk/app-debug.apk`.
 
-On this Windows workstation, the normal APK command encountered a Kotlin incremental-cache path error because the Pub cache is on `C:` while the project is on `D:`. If that same local-only error recurs, stop Gradle, clean only generated Flutter output, restore packages, and run the equivalent build with incremental Kotlin compilation disabled:
+On this Windows workstation, the normal APK command initially encountered a Kotlin incremental-cache path error because the Pub cache is on `C:` while the project is on `D:`. The project now sets `kotlin.incremental=false` in `android/gradle.properties`, so the normal Flutter build/run commands work across those drive roots. If stale caches survive an update, stop Gradle and clean only generated Flutter output before rebuilding:
 
 ```powershell
 Set-Location D:\OtherProjects\KK10P-banking-app\banking-lab\mobile\banking_mobile\android
 .\gradlew.bat --stop
 flutter clean
 flutter pub get
-.\gradlew.bat app:assembleDebug "-Pkotlin.incremental=false" --no-daemon
+Set-Location ..
+flutter build apk --debug
 ```
 
-This workaround changes no source, database, or runtime compatibility setting.
+This build setting trades incremental Kotlin compilation speed for deterministic cross-drive plugin builds. It changes no database or runtime compatibility setting.
 
 ## Run the candidate for phone verification
 
