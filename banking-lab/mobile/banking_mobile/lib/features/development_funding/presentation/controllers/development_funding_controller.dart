@@ -2,6 +2,7 @@ import 'package:banking_mobile/core/errors/api_error_mapper.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/identifiers/secure_uuid_v4.dart';
 import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
+import 'package:banking_mobile/features/activity/presentation/controllers/activity_controller.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:banking_mobile/features/development_funding/data/models/development_funding_receipt.dart';
@@ -31,12 +32,14 @@ class DevelopmentFundingController
     this._isCurrent,
     this._invalidateSession,
     this._refreshAccount,
+    this._refreshActivity,
   ) : super(const DevelopmentFundingState(DevelopmentFundingStatus.idle));
 
   final DevelopmentFundingRepository _repository;
   final bool Function() _isCurrent;
   final Future<void> Function() _invalidateSession;
   final void Function() _refreshAccount;
+  final void Function() _refreshActivity;
   String? _pendingKey;
 
   Future<void> fund() async {
@@ -52,6 +55,7 @@ class DevelopmentFundingController
         receipt: receipt,
       );
       _refreshAccount();
+      _refreshActivity();
     } on UnauthenticatedFailure {
       _pendingKey = null;
       if (mounted && _isCurrent()) await _invalidateSession();
@@ -95,5 +99,6 @@ final developmentFundingControllerProvider =
             .read(authenticationControllerProvider.notifier)
             .invalidateSession(generation),
         () => ref.invalidate(accountControllerProvider),
+        () => ref.invalidate(activityControllerProvider),
       );
     });

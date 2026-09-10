@@ -15,6 +15,7 @@ void main() {
       () => true,
       () async {},
       () => refreshes++,
+      () {},
     );
     repository.onFund = (_) async => throw const NetworkFailure();
     await controller.fund();
@@ -46,6 +47,7 @@ void main() {
         repository,
         () => true,
         () async {},
+        () {},
         () {},
       );
       final first = controller.fund();

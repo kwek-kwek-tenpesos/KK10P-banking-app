@@ -1,6 +1,7 @@
 import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:banking_mobile/core/ui/kk_embossed_controls.dart';
 import 'package:banking_mobile/core/ui/kk_page_body.dart';
+import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:banking_mobile/features/accounts/presentation/widgets/account_card.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class CustomerHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(authenticationControllerProvider);
+    final accountState = ref.watch(accountControllerProvider);
     final customer = state.customer;
     final displayName = customer?.displayName?.trim();
     final greetingName = displayName == null || displayName.isEmpty
@@ -76,6 +78,15 @@ class CustomerHomeScreen extends ConsumerWidget {
             const SizedBox(height: KkSpacing.lg),
             if (state.isAuthenticated)
               AccountCard(onTransfer: () => context.push('/transfer')),
+            if (state.isAuthenticated &&
+                accountState.status == AccountStatus.loaded) ...[
+              const SizedBox(height: KkSpacing.md),
+              KkEmbossedButton(
+                onPressed: () => context.push('/activity'),
+                icon: const Icon(Icons.receipt_long_outlined),
+                label: const Text('View activity'),
+              ),
+            ],
             const SizedBox(height: KkSpacing.lg),
             KkEmbossedButton(
               onPressed: state.isSubmitting

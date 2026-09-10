@@ -164,6 +164,12 @@ public sealed class AppDbContextModelTests
             index.GetDatabaseName() == LedgerTransaction.InitiatorIdempotencyIndex);
         Assert.Contains(posting.GetIndexes(), index => index.IsUnique &&
             index.GetDatabaseName() == LedgerPosting.TransactionPositionIndex);
+        var activityIndex = Assert.Single(posting.GetIndexes(), index =>
+            index.GetDatabaseName() == LedgerPosting.ActivityHistoryIndex);
+        Assert.Equal(
+            [nameof(LedgerPosting.CustomerAccountId), nameof(LedgerPosting.CreatedAtUtc),
+                nameof(LedgerPosting.LedgerTransactionId)],
+            activityIndex.Properties.Select(property => property.Name).ToArray());
         Assert.All(transaction.GetForeignKeys(), key => Assert.Equal(DeleteBehavior.Restrict, key.DeleteBehavior));
         Assert.All(posting.GetForeignKeys(), key => Assert.Equal(DeleteBehavior.Restrict, key.DeleteBehavior));
     }

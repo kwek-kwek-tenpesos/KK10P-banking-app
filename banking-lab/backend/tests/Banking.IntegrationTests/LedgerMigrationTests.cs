@@ -1,5 +1,6 @@
 using Banking.api.Migrations;
 using banking_lab.infrastructure.temporary;
+using Banking.Api.Features.Ledger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -9,6 +10,29 @@ namespace Banking.IntegrationTests;
 
 public sealed class LedgerMigrationTests
 {
+    [Fact]
+    public void ActivityMigrationAddsAndRemovesOnlyTheHistoryIndex()
+    {
+        var migration = new AddActivityHistoryIndex();
+        var create = Assert.Single(migration.UpOperations.OfType<CreateIndexOperation>());
+        Assert.Equal(LedgerPosting.ActivityHistoryIndex, create.Name);
+        Assert.True(create.Name!.Length <= 63);
+        Assert.Equal("LedgerPostings", create.Table);
+        Assert.Equal(["CustomerAccountId", "CreatedAtUtc", "LedgerTransactionId"], create.Columns);
+        Assert.NotNull(create.IsDescending);
+        Assert.Equal([false, true, true], create.IsDescending!);
+        Assert.Empty(migration.UpOperations.OfType<CreateTableOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DropTableOperation>());
+        Assert.Empty(migration.UpOperations.OfType<AddColumnOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DropColumnOperation>());
+        Assert.Empty(migration.UpOperations.OfType<AlterColumnOperation>());
+        Assert.Empty(migration.UpOperations.OfType<DeleteDataOperation>());
+        Assert.Empty(migration.UpOperations.OfType<UpdateDataOperation>());
+        var drop = Assert.Single(migration.DownOperations.OfType<DropIndexOperation>());
+        Assert.Equal(create.Name, drop.Name);
+        Assert.Equal(create.Table, drop.Table);
+    }
+
     [Fact]
     public void InternalTransferMigrationOnlyWidensTheOperationConstraint()
     {
@@ -73,6 +97,21 @@ public sealed class LedgerMigrationTests
             "20260908124011_AddLedgerAndDevelopmentFunding", "20260909065721_AddInternalTransfers");
         Assert.Contains("DROP CONSTRAINT \"CK_LedgerTransactions_Operation\"", sql);
         Assert.Contains("CHECK (\"Operation\" IN ('DEVELOPMENT_FUNDING', 'INTERNAL_TRANSFER'))", sql);
+        Assert.DoesNotContain("CREATE TABLE", sql);
+        Assert.DoesNotContain("DROP TABLE", sql);
+        Assert.DoesNotContain("UPDATE \"", sql);
+        Assert.DoesNotContain("DELETE FROM", sql);
+        Assert.False(context.Database.HasPendingModelChanges());
+    }
+
+    [Fact]
+    public void ActivitySqlIsAdditiveIndexOnlyAndHasNoModelDrift()
+    {
+        using var context = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseNpgsql().Options);
+        var sql = context.GetService<IMigrator>().GenerateScript(
+            "20260909065721_AddInternalTransfers", "20260910054031_AddActivityHistoryIndex");
+        Assert.Contains($"CREATE INDEX \"{LedgerPosting.ActivityHistoryIndex}\"", sql);
+        Assert.Contains("\"CustomerAccountId\", \"CreatedAtUtc\" DESC, \"LedgerTransactionId\" DESC", sql);
         Assert.DoesNotContain("CREATE TABLE", sql);
         Assert.DoesNotContain("DROP TABLE", sql);
         Assert.DoesNotContain("UPDATE \"", sql);

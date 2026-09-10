@@ -128,6 +128,16 @@ final class TransferIdempotencyConflictFailure extends AppFailure {
       );
 }
 
+final class ActivityAccountRequiredFailure extends AppFailure {
+  const ActivityAccountRequiredFailure({super.requestId})
+    : super('Open your simulator account to view Activity.');
+}
+
+final class ActivityTransactionNotFoundFailure extends AppFailure {
+  const ActivityTransactionNotFoundFailure({super.requestId})
+    : super('That transaction is not available for this simulator account.');
+}
+
 final class PendingTransferStorageFailure extends AppFailure {
   const PendingTransferStorageFailure({this.corrupt = false})
     : super(

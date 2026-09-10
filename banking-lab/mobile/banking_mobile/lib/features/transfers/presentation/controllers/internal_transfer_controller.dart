@@ -4,6 +4,7 @@ import 'package:banking_mobile/core/errors/api_error_mapper.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/identifiers/secure_uuid_v4.dart';
 import 'package:banking_mobile/features/accounts/presentation/controllers/account_controller.dart';
+import 'package:banking_mobile/features/activity/presentation/controllers/activity_controller.dart';
 import 'package:banking_mobile/features/authentication/data/repositories/authentication_repository.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:banking_mobile/features/transfers/data/models/internal_transfer_receipt.dart';
@@ -124,7 +125,8 @@ class InternalTransferController extends StateNotifier<InternalTransferState> {
     this._customerId,
     this._isCurrent,
     this._invalidateSession,
-    this._refreshAccount, {
+    this._refreshAccount,
+    this._refreshActivity, {
     String Function()? newId,
     DateTime Function()? now,
   }) : _newId = newId ?? newSecureUuidV4,
@@ -139,6 +141,7 @@ class InternalTransferController extends StateNotifier<InternalTransferState> {
   final bool Function() _isCurrent;
   final Future<void> Function() _invalidateSession;
   final void Function() _refreshAccount;
+  final void Function() _refreshActivity;
   final String Function() _newId;
   final DateTime Function() _now;
   bool _operationInFlight = false;
@@ -312,6 +315,7 @@ class InternalTransferController extends StateNotifier<InternalTransferState> {
       final receipt = await _repository.transfer(pending);
       if (!mounted || !_isCurrent()) return;
       _refreshAccount();
+      _refreshActivity();
       await _clearAfterSuccess(pending, receipt);
     } on UnauthenticatedFailure {
       if (mounted && _isCurrent()) {
@@ -539,5 +543,6 @@ final internalTransferControllerProvider =
             .read(authenticationControllerProvider.notifier)
             .invalidateSession(generation),
         () => ref.invalidate(accountControllerProvider),
+        () => ref.invalidate(activityControllerProvider),
       );
     });

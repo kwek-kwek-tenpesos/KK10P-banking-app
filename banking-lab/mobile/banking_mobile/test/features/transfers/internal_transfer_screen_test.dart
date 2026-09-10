@@ -125,6 +125,7 @@ Future<_TransferHarness> _pumpTransfer(
     () => true,
     () async {},
     () {},
+    () {},
     newId: () => idempotencyKey,
     now: () => DateTime.utc(2026, 9, 9),
   );

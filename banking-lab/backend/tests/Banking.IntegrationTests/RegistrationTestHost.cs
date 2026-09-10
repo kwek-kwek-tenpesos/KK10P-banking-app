@@ -1,5 +1,6 @@
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
+using Banking.Api.Features.Activity;
 using Banking.Api.Features.Transfers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,7 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
     public RecordingVerificationDelivery Delivery { get; } = new();
     public RegistrationTestLogger Log { get; } = new();
     public InternalTransferTestLogger TransferLog { get; } = new();
+    public ActivityTestLogger ActivityLog { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -62,6 +64,7 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
             services.AddSingleton<ICustomerVerificationDelivery>(Delivery);
             services.AddSingleton<ILogger<CustomerRegistrationService>>(Log);
             services.AddSingleton<ILogger<InternalTransferLog>>(TransferLog);
+            services.AddSingleton<ILogger<ActivityLog>>(ActivityLog);
         });
     }
 
@@ -75,6 +78,16 @@ internal sealed class RegistrationTestHost : WebApplicationFactory<Program>
             return ValueTask.FromResult(result);
         }
     }
+}
+
+internal sealed class ActivityTestLogger : ILogger<ActivityLog>
+{
+    public List<string> Messages { get; } = [];
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+    public bool IsEnabled(LogLevel logLevel) => true;
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state,
+        Exception? exception, Func<TState, Exception?, string> formatter) =>
+        Messages.Add(formatter(state, exception));
 }
 
 internal sealed class InternalTransferTestLogger : ILogger<InternalTransferLog>

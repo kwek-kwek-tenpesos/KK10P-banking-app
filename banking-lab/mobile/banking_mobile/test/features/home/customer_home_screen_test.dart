@@ -30,6 +30,7 @@ void main() {
     expect(find.text('PHP 0.00'), findsOneWidget);
     expect(find.byTooltip('API diagnostics'), findsOneWidget);
     expect(find.text('Transfer funds'), findsOneWidget);
+    expect(find.text('View activity'), findsOneWidget);
     expect(find.text('Copy account reference'), findsOneWidget);
     expect(find.text('Sign out'), findsOneWidget);
     for (final unsupported in [

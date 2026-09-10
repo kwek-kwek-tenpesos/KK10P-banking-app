@@ -128,6 +128,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         posting.HasIndex(item => new { item.LedgerTransactionId, item.Position })
             .IsUnique().HasDatabaseName(LedgerPosting.TransactionPositionIndex);
         posting.HasIndex(item => item.CustomerAccountId);
+        posting.HasIndex(item => new
+            {
+                item.CustomerAccountId,
+                item.CreatedAtUtc,
+                item.LedgerTransactionId
+            })
+            .IsDescending(false, true, true)
+            .HasDatabaseName(LedgerPosting.ActivityHistoryIndex);
         posting.HasOne(item => item.LedgerTransaction).WithMany(item => item.Postings)
             .HasForeignKey(item => item.LedgerTransactionId).OnDelete(DeleteBehavior.Restrict);
         posting.HasOne(item => item.CustomerAccount).WithMany()

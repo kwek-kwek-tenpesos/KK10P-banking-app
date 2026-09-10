@@ -6,6 +6,8 @@ public sealed class LedgerPosting
 {
     public const string SimulatorIssuer = "SIMULATOR_ISSUER";
     public const string TransactionPositionIndex = "IX_LedgerPostings_LedgerTransactionId_Position";
+    public const string ActivityHistoryIndex =
+        "IX_LedgerPostings_Account_CreatedAt_Transaction";
 
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid LedgerTransactionId { get; set; }

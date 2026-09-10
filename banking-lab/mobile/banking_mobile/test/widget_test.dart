@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:banking_mobile/app/app.dart';
+import 'package:banking_mobile/app/app_router.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
 import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
 import 'package:banking_mobile/core/preferences/app_preferences_store.dart';
@@ -96,6 +97,29 @@ void main() {
     expect(find.text('Version: v1.0.0'), findsOneWidget);
     expect(find.text('Environment: Test'), findsOneWidget);
   });
+
+  testWidgets(
+    'signed-out activity list and detail deep links return to login',
+    (tester) async {
+      await tester.pumpWidget(
+        _testApp(store: _MemorySessionStore(), api: _FakeAuthenticationApi()),
+      );
+      await tester.pumpAndSettle();
+
+      final context = tester.element(find.byType(MaterialApp));
+      final container = ProviderScope.containerOf(context);
+      final router = container.read(appRouterProvider);
+
+      router.go('/activity');
+      await tester.pumpAndSettle();
+      expect(find.text('Sign in to KK10P'), findsOneWidget);
+
+      router.go('/activity/11111111-1111-1111-1111-111111111111');
+      await tester.pumpAndSettle();
+      expect(find.text('Sign in to KK10P'), findsOneWidget);
+      expect(find.text('Historical receipt'), findsNothing);
+    },
+  );
 
   testWidgets('Development diagnostics shows funding only after sign-in', (
     tester,

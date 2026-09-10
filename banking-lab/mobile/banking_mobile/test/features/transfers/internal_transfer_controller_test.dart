@@ -179,6 +179,7 @@ InternalTransferController _controller(
   () => true,
   () async {},
   refresh ?? () {},
+  () {},
   newId: () => idempotencyKey,
   now: () => DateTime.utc(2026, 9, 9),
 );

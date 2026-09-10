@@ -1,5 +1,6 @@
 using System.Text;
 using Banking.Api.Features.Accounts;
+using Banking.Api.Features.Activity;
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
 using Banking.Api.Features.Ledger;
@@ -27,9 +28,11 @@ builder.Services.AddOptions<SmtpOptions>()
 builder.Services.AddTrustedLoopbackForwarding();
 builder.Services.AddAuthenticationRequestGuards();
 builder.Services.AddAccountRequestGuards();
+builder.Services.AddActivityRequestGuards();
 builder.Services.AddDevelopmentFundingRequestGuards();
 builder.Services.AddInternalTransferRequestGuards();
 builder.Services.AddScoped<CustomerAccountService>();
+builder.Services.AddScoped<ActivityService>();
 builder.Services.AddScoped<DevelopmentFundingService>();
 builder.Services.AddScoped<InternalTransferService>();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -136,11 +139,13 @@ app.Use(async (context, next) =>
     await next();
 });
 app.Use(AccountRequestGuards.EnforceTransportAsync);
+app.Use(ActivityRequestGuards.EnforceTransportAsync);
 if (developmentFundingEnabled)
     app.Use(DevelopmentFundingRequestGuards.EnforceTransportAsync);
 app.Use(InternalTransferRequestGuards.EnforceTransportAsync);
 app.UseRateLimiter();
 app.Use(AccountRequestGuards.EnforceInputAsync);
+app.Use(ActivityRequestGuards.EnforceInputAsync);
 if (developmentFundingEnabled)
     app.Use(DevelopmentFundingRequestGuards.EnforceInputAsync);
 app.Use(InternalTransferRequestGuards.EnforceInputAsync);
@@ -334,6 +339,7 @@ app.MapGet("/api/v1/auth/me", (HttpContext context) =>
     .Produces(StatusCodes.Status200OK).ProducesProblem(401).ProducesProblem(503);
 
 app.MapCustomerAccounts();
+app.MapActivity();
 if (developmentFundingEnabled)
     app.MapDevelopmentFunding();
 app.MapInternalTransfers();

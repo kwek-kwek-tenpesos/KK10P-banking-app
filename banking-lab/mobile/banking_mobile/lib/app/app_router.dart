@@ -1,6 +1,8 @@
 import 'package:banking_mobile/core/preferences/app_preferences_controller.dart';
 import 'package:banking_mobile/core/theme/kk_theme.dart';
 import 'package:banking_mobile/core/ui/kk_soft_surface.dart';
+import 'package:banking_mobile/features/activity/presentation/screens/activity_detail_screen.dart';
+import 'package:banking_mobile/features/activity/presentation/screens/activity_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/controllers/authentication_controller.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/email_verification_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/login_screen.dart';
@@ -41,7 +43,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location == '/welcome' ||
           location == '/login' ||
           location == '/register';
-      final isProtected = location == '/home' || location == '/transfer';
+      final isProtected =
+          location == '/home' ||
+          location == '/transfer' ||
+          location == '/activity' ||
+          location.startsWith('/activity/');
 
       if (auth.status == AuthenticationStatus.initializing ||
           !preferences.isReady) {
@@ -94,6 +100,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/transfer',
         builder: (context, state) => const InternalTransferScreen(),
+      ),
+      GoRoute(
+        path: '/activity',
+        builder: (context, state) => const ActivityScreen(),
+      ),
+      GoRoute(
+        path: '/activity/:transactionId',
+        builder: (context, state) => ActivityDetailScreen(
+          transactionId: state.pathParameters['transactionId'] ?? '',
+        ),
       ),
       GoRoute(
         path: '/material-proof',

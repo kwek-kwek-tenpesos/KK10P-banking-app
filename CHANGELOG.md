@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-10 — Gate 7R shared Activity-index rollout
+- Backed up and reconciled shared `banking_lab`, applied only `20260910054031_AddActivityHistoryIndex` while the API was quiesced, verified the exact valid index and unchanged users/sessions/tokens/accounts/balances/eight journals, then restarted the API and passed authenticated no-store Activity list/detail smoke checks. No funding or transfer was executed.
+
+### 2026-09-10 — KK10P Activity/history candidate
+- Added owner-scoped read-only Activity pagination and historical receipts for committed funding and internal transfers, with strict filters/cursors, privacy-preserving detail lookup, fail-closed journal projection, protected responsive Flutter screens, compact filters, and post-write invalidation. The additive index passed fresh disposable PostgreSQL proof and Gate 7R shared rollout; 254 ordinary backend tests, clean Flutter analysis, and all 217 Flutter tests pass. Chris/Gio phone acceptance remains pending.
+
 ### 2026-09-10 — Slice 6 real-device transfer acceptance
 - Completed Chris↔Gio physical-device transfer verification, including an auto-clicker duplicate-submission check that moved PHP 1.00 once. Reconciled four intentional transfers with unique idempotency keys, two zero-sum postings each, no malformed journals, and an unchanged PHP 200,000.00 combined balance; interrupted-network recovery remains automated-test verified and Activity/history remains deferred to Slice 7.
 
