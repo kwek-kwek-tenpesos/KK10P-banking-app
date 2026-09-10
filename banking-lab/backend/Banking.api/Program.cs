@@ -3,6 +3,7 @@ using Banking.Api.Features.Accounts;
 using Banking.Api.Features.Activity;
 using banking_lab.infrastructure.temporary;
 using Banking.Api.Features.Authentication;
+using Banking.Api.Features.ClientCompatibility;
 using Banking.Api.Features.Ledger;
 using Banking.Api.Features.Transfers;
 using Banking.Api.Observability;
@@ -27,6 +28,7 @@ builder.Services.AddOptions<SmtpOptions>()
     .Bind(builder.Configuration.GetSection(SmtpOptions.SectionName)).ValidateOnStart();
 builder.Services.AddTrustedLoopbackForwarding();
 builder.Services.AddAuthenticationRequestGuards();
+builder.Services.AddClientCompatibility(builder.Configuration);
 builder.Services.AddAccountRequestGuards();
 builder.Services.AddActivityRequestGuards();
 builder.Services.AddDevelopmentFundingRequestGuards();
@@ -134,6 +136,7 @@ app.UseRouting();
 app.Use(async (context, next) =>
 {
     if (context.Request.Path.StartsWithSegments("/api/v1/auth") ||
+        ClientCompatibilityEndpoints.IsCompatibilityPath(context.Request.Path) ||
         context.Request.Path.StartsWithSegments(InternalTransferEndpoints.RoutePrefix))
         context.Response.Headers.CacheControl = "no-store";
     await next();
@@ -144,6 +147,7 @@ if (developmentFundingEnabled)
     app.Use(DevelopmentFundingRequestGuards.EnforceTransportAsync);
 app.Use(InternalTransferRequestGuards.EnforceTransportAsync);
 app.UseRateLimiter();
+app.UseMiddleware<ClientCompatibilityMiddleware>();
 app.Use(AccountRequestGuards.EnforceInputAsync);
 app.Use(ActivityRequestGuards.EnforceInputAsync);
 if (developmentFundingEnabled)
@@ -165,6 +169,8 @@ app.MapGet("/api/v1/system/info", (IWebHostEnvironment env) =>
         version = "v1.0.0",
         environment = env.EnvironmentName
     }));
+
+app.MapClientCompatibility();
 
 app.MapPost("/api/v1/auth/register", async (
     CustomerRegistrationRequest request,

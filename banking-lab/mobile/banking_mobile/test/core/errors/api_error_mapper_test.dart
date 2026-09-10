@@ -75,6 +75,87 @@ void main() {
       expect(serverFailure.statusCode, 503);
     });
 
+    test('maps only a strict trusted 426 contract to upgrade required', () {
+      final requestOptions = RequestOptions();
+      final response = Response<Map<String, dynamic>>(
+        requestOptions: requestOptions,
+        statusCode: 426,
+        data: {
+          'code': 'client_upgrade_required',
+          'platform': 'ANDROID',
+          'currentBuild': 1,
+          'minimumBuild': 2,
+          'updateUri': 'https://downloads.example.test/kk10p',
+          'traceId': 'request-upgrade',
+        },
+      );
+
+      final failure = mapApiError(
+        DioException.badResponse(
+          statusCode: 426,
+          requestOptions: requestOptions,
+          response: response,
+        ),
+      );
+
+      expect(failure, isA<ClientUpgradeRequiredFailure>());
+      final upgrade = failure as ClientUpgradeRequiredFailure;
+      expect(upgrade.currentBuild, 1);
+      expect(upgrade.minimumBuild, 2);
+      expect(upgrade.updateUri.scheme, 'https');
+      expect(upgrade.requestId, 'request-upgrade');
+    });
+
+    test('fails closed to ServerFailure for an untrusted 426 update URI', () {
+      final requestOptions = RequestOptions();
+      final response = Response<Map<String, dynamic>>(
+        requestOptions: requestOptions,
+        statusCode: 426,
+        data: {
+          'code': 'client_upgrade_required',
+          'platform': 'ANDROID',
+          'currentBuild': 1,
+          'minimumBuild': 2,
+          'updateUri': 'http://downloads.example.test/kk10p',
+        },
+      );
+
+      final failure = mapApiError(
+        DioException.badResponse(
+          statusCode: 426,
+          requestOptions: requestOptions,
+          response: response,
+        ),
+      );
+
+      expect(failure, isA<ServerFailure>());
+    });
+
+    test('fails closed to ServerFailure for an oversized 426 update URI', () {
+      final requestOptions = RequestOptions();
+      final response = Response<Map<String, dynamic>>(
+        requestOptions: requestOptions,
+        statusCode: 426,
+        data: {
+          'code': 'client_upgrade_required',
+          'platform': 'ANDROID',
+          'currentBuild': 1,
+          'minimumBuild': 2,
+          'updateUri': 'https://downloads.example.test/${'a' * 2050}',
+        },
+      );
+
+      final failure = mapApiError(
+        DioException.badResponse(
+          statusCode: 426,
+          requestOptions: requestOptions,
+          response: response,
+        ),
+      );
+
+      expect(failure, isA<ServerFailure>());
+    });
+
     test('maps a cancelled request to RequestCancelledFailure', () {
       final error = DioException(
         requestOptions: RequestOptions(),

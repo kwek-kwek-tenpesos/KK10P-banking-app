@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:banking_mobile/app/app.dart';
 import 'package:banking_mobile/app/app_router.dart';
 import 'package:banking_mobile/core/errors/app_failure.dart';
+import 'package:banking_mobile/core/errors/client_upgrade_signal.dart';
 import 'package:banking_mobile/core/preferences/app_preferences_provider.dart';
 import 'package:banking_mobile/core/preferences/app_preferences_store.dart';
 import 'package:banking_mobile/features/accounts/data/models/account_summary.dart';
@@ -14,6 +15,7 @@ import 'package:banking_mobile/features/authentication/data/models/authenticatio
 import 'package:banking_mobile/features/authentication/data/models/registration_request.dart';
 import 'package:banking_mobile/features/authentication/data/models/registration_response.dart';
 import 'package:banking_mobile/features/authentication/data/services/authentication_api_service.dart';
+import 'package:banking_mobile/features/client_compatibility/presentation/controllers/client_compatibility_controller.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:banking_mobile/features/transfers/data/storage/pending_internal_transfer_store.dart';
@@ -44,8 +46,9 @@ void main() {
     expect(find.text('Not a financial institution'), findsOneWidget);
     expect(find.textContaining('hardware encrypted'), findsNothing);
 
-    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Sign in'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    final signIn = find.widgetWithText(FilledButton, 'Sign in');
+    await tester.ensureVisible(signIn);
+    await tester.tap(signIn);
     await tester.pumpAndSettle();
 
     expect(preferences.snapshot.introductionCompleted, isTrue);
@@ -324,6 +327,62 @@ void main() {
     expect(find.text('PHP 0.00'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('late upgrade requirement is global and preserves the session', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 1000);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final store = _MemorySessionStore();
+    final pendingTransfers = MemoryPendingTransferStore();
+    await pendingTransfers.save(samplePending());
+    await tester.pumpWidget(
+      _testApp(
+        store: store,
+        api: _FakeAuthenticationApi(),
+        pendingTransfers: pendingTransfers,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Email address'),
+      'customer@example.test',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Password'),
+      'fake-password',
+    );
+    final updateTestSignIn = find.widgetWithText(FilledButton, 'Sign in');
+    await tester.ensureVisible(updateTestSignIn);
+    await tester.tap(updateTestSignIn);
+    await tester.pumpAndSettle();
+    expect(store.refreshToken, 'new-refresh');
+
+    final context = tester.element(find.byType(MaterialApp));
+    final container = ProviderScope.containerOf(context);
+    container
+        .read(clientUpgradeSignalProvider.notifier)
+        .report(
+          ClientUpgradeRequiredFailure(
+            platform: 'ANDROID',
+            currentBuild: 2,
+            minimumBuild: 3,
+            updateUri: Uri.parse('https://downloads.example.test/kk10p'),
+          ),
+        );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Update required'), findsOneWidget);
+    expect(find.text('Update app'), findsOneWidget);
+    expect(store.refreshToken, 'new-refresh');
+    expect(pendingTransfers.values[customerId], isNotNull);
+    expect(pendingTransfers.clears, 0);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Widget _testApp({
@@ -331,6 +390,7 @@ Widget _testApp({
   required _FakeAuthenticationApi api,
   StubAccountsApi? accounts,
   MemoryAppPreferencesStore? preferences,
+  MemoryPendingTransferStore? pendingTransfers,
   String systemEnvironment = 'Test',
 }) {
   final preferenceStore =
@@ -343,11 +403,12 @@ Widget _testApp({
       secureSessionStoreProvider.overrideWithValue(store),
       appPreferencesStoreProvider.overrideWithValue(preferenceStore),
       authenticationApiServiceProvider.overrideWithValue(api),
+      clientCompatibilityChecksEnabledProvider.overrideWithValue(false),
       accountsApiServiceProvider.overrideWithValue(
         accounts ?? StubAccountsApi(),
       ),
       pendingInternalTransferStoreProvider.overrideWithValue(
-        MemoryPendingTransferStore(),
+        pendingTransfers ?? MemoryPendingTransferStore(),
       ),
       systemInfoProvider.overrideWith(
         (ref) async => SystemInfo(

@@ -7,6 +7,8 @@ import 'package:banking_mobile/features/authentication/presentation/controllers/
 import 'package:banking_mobile/features/authentication/presentation/screens/email_verification_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/login_screen.dart';
 import 'package:banking_mobile/features/authentication/presentation/screens/registration_screen.dart';
+import 'package:banking_mobile/features/client_compatibility/presentation/controllers/client_compatibility_controller.dart';
+import 'package:banking_mobile/features/client_compatibility/presentation/screens/update_required_screen.dart';
 import 'package:banking_mobile/features/home/presentation/screens/customer_home_screen.dart';
 import 'package:banking_mobile/features/material_proof/presentation/screens/material_proof_screen.dart';
 import 'package:banking_mobile/features/onboarding/presentation/screens/welcome_screen.dart';
@@ -18,27 +20,49 @@ import 'package:go_router/go_router.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ValueNotifier(ref.read(authenticationControllerProvider));
+  final compatibilityState = ValueNotifier(
+    ref.read(clientCompatibilityControllerProvider),
+  );
   final preferencesState = ValueNotifier(
     ref.read(appPreferencesControllerProvider),
   );
   ref.listen(authenticationControllerProvider, (_, next) {
     authState.value = next;
   });
+  ref.listen(clientCompatibilityControllerProvider, (_, next) {
+    compatibilityState.value = next;
+  });
   ref.listen(appPreferencesControllerProvider, (_, next) {
     preferencesState.value = next;
   });
   ref.onDispose(() {
     authState.dispose();
+    compatibilityState.dispose();
     preferencesState.dispose();
   });
 
   final router = GoRouter(
     initialLocation: '/',
-    refreshListenable: Listenable.merge([authState, preferencesState]),
+    refreshListenable: Listenable.merge([
+      authState,
+      compatibilityState,
+      preferencesState,
+    ]),
     redirect: (context, state) {
       final auth = authState.value;
+      final compatibility = compatibilityState.value;
       final preferences = preferencesState.value;
       final location = state.matchedLocation;
+
+      if (compatibility.status == ClientCompatibilityStatus.updateRequired ||
+          compatibility.status == ClientCompatibilityStatus.invalidLocalBuild) {
+        return location == '/update-required' ? null : '/update-required';
+      }
+      if (compatibility.status == ClientCompatibilityStatus.checking ||
+          compatibility.status == ClientCompatibilityStatus.unavailable) {
+        return location == '/' ? null : '/';
+      }
+      if (location == '/update-required') return '/';
       final isAuthEntry =
           location == '/welcome' ||
           location == '/login' ||
@@ -69,6 +93,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const _StartupScreen()),
+      GoRoute(
+        path: '/update-required',
+        builder: (context, state) => const UpdateRequiredScreen(),
+      ),
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
@@ -121,12 +149,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-class _StartupScreen extends StatelessWidget {
+class _StartupScreen extends ConsumerWidget {
   const _StartupScreen();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tokens = KkMaterialTokens.of(context);
+    final compatibility = ref.watch(clientCompatibilityControllerProvider);
+    final unavailable =
+        compatibility.status == ClientCompatibilityStatus.unavailable;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -150,9 +181,27 @@ class _StartupScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: KkSpacing.lg),
-                const CircularProgressIndicator(
-                  semanticsLabel: 'Restoring your session and preferences',
-                ),
+                if (unavailable) ...[
+                  Text(
+                    compatibility.failure?.message ?? 'The app version could not be checked. Please try again.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: tokens.textSecondary),
+                  ),
+                  const SizedBox(height: KkSpacing.md),
+                  FilledButton.icon(
+                    onPressed: () {
+                      ref
+                          .read(clientCompatibilityControllerProvider.notifier)
+                          .check();
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Try again'),
+                  ),
+                ] else
+                  const CircularProgressIndicator(
+                    semanticsLabel:
+                        'Checking app compatibility and restoring your session',
+                  ),
               ],
             ),
           ),

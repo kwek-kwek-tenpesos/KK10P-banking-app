@@ -6,6 +6,7 @@ import 'package:banking_mobile/core/storage/secure_session_store_provider.dart';
 import 'package:banking_mobile/features/accounts/data/services/accounts_api_service.dart';
 import 'package:banking_mobile/features/authentication/data/models/authentication_models.dart';
 import 'package:banking_mobile/features/authentication/data/services/authentication_api_service.dart';
+import 'package:banking_mobile/features/client_compatibility/presentation/controllers/client_compatibility_controller.dart';
 import 'package:banking_mobile/features/system_info/data/models/system_info.dart';
 import 'package:banking_mobile/features/system_info/presentation/providers/system_info_provider.dart';
 import 'package:flutter/material.dart';
@@ -112,6 +113,7 @@ Future<void> _pumpHome(
           ),
         ),
         authenticationApiServiceProvider.overrideWithValue(authApi),
+        clientCompatibilityChecksEnabledProvider.overrideWithValue(false),
         accountsApiServiceProvider.overrideWithValue(accountsApi),
         systemInfoProvider.overrideWith(
           (ref) async => const SystemInfo(

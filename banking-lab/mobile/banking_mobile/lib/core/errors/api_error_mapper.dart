@@ -36,6 +36,9 @@ AppFailure _mapBadResponse(Response<dynamic>? response) {
   final data = response?.data;
   final requestId = _requestId(response);
 
+  final upgradeRequired = mapClientUpgradeResponse(response);
+  if (upgradeRequired != null) return upgradeRequired;
+
   if (statusCode == 401) {
     return const UnauthenticatedFailure();
   }
@@ -74,6 +77,48 @@ AppFailure _mapBadResponse(Response<dynamic>? response) {
   }
 
   return ServerFailure(statusCode: statusCode, requestId: requestId);
+}
+
+ClientUpgradeRequiredFailure? mapClientUpgradeResponse(
+  Response<dynamic>? response,
+) {
+  if (response?.statusCode != 426) return null;
+  final data = response?.data;
+  if (data is! Map || data['code'] != 'client_upgrade_required') return null;
+
+  final platform = data['platform'];
+  final currentBuild = data['currentBuild'];
+  final minimumBuild = data['minimumBuild'];
+  final updateUriText = data['updateUri'];
+  if (platform != 'ANDROID' ||
+      (currentBuild != null &&
+          (currentBuild is! int ||
+              currentBuild < 1 ||
+              currentBuild > 999999999)) ||
+      minimumBuild is! int ||
+      minimumBuild < 1 ||
+      minimumBuild > 999999999 ||
+      updateUriText is! String ||
+      updateUriText.length > 2048) {
+    return null;
+  }
+
+  final updateUri = Uri.tryParse(updateUriText);
+  if (updateUri == null ||
+      updateUri.scheme != 'https' ||
+      !updateUri.hasAuthority ||
+      updateUri.host.isEmpty ||
+      updateUri.userInfo.isNotEmpty) {
+    return null;
+  }
+
+  return ClientUpgradeRequiredFailure(
+    platform: platform,
+    currentBuild: currentBuild as int?,
+    minimumBuild: minimumBuild,
+    updateUri: updateUri,
+    requestId: _requestId(response),
+  );
 }
 
 String? _requestId(Response<dynamic>? response) {

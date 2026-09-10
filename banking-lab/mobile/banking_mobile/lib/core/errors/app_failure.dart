@@ -32,6 +32,21 @@ final class ServerFailure extends AppFailure {
   final int? statusCode;
 }
 
+final class ClientUpgradeRequiredFailure extends AppFailure {
+  const ClientUpgradeRequiredFailure({
+    required this.platform,
+    required this.minimumBuild,
+    required this.updateUri,
+    this.currentBuild,
+    super.requestId,
+  }) : super('A newer KK10P Bank app is required before you can continue.');
+
+  final String platform;
+  final int? currentBuild;
+  final int minimumBuild;
+  final Uri updateUri;
+}
+
 final class InvalidResponseFailure extends AppFailure {
   const InvalidResponseFailure({super.requestId})
     : super('The server returned data the app could not understand.');

@@ -31,6 +31,7 @@ public sealed class OpenApiEndpointTests
 
         Assert.True(root.TryGetProperty("paths", out var paths));
         Assert.True(paths.TryGetProperty("/api/v1/system/info", out _));
+        Assert.True(paths.TryGetProperty("/api/v1/client/compatibility", out _));
         Assert.True(paths.TryGetProperty("/api/v1/auth/register", out _));
         Assert.True(paths.TryGetProperty("/api/v1/auth/login", out _));
         Assert.True(paths.TryGetProperty("/api/v1/auth/refresh", out _));

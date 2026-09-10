@@ -1,6 +1,6 @@
 # KK10P Prototype-to-Flutter Master Roadmap
 
-- Status: Revision A, Slice 1 and Slice 2 are complete and physically approved. Slice 3 Home/account planning is next; no Slice 3 implementation is approved yet.
+- Status: Revision A and Slices 1–7 are complete and physically accepted. Slice 8A is implemented as an enforcement-disabled build-2 candidate; Chris/Gio acceptance and Gate 8A-R activation remain pending.
 - Prepared: 2026-09-07.
 - Goal: Translate the approved parts of the AI Studio Kotlin prototype into a clean, truthful and maintainable Flutter customer experience, then add the smallest backend-led fake-money features needed for Chris and Gio to transact.
 - Design source: [prototype adoption audit](../05_Design/kk10p-prototype-adoption-audit.md).
@@ -73,7 +73,9 @@ Audit and approve direction
   -> Slice 5 internal transfer API
   -> Slice 6 Flutter transfer journey
   -> Slice 7 activity/history and receipt
-  -> Slice 8 navigation and clean Home integration
+  -> Slice 8A required client updates
+  -> Slice 8B six-digit PIN, fingerprint and privacy cover
+  -> Slice 8C navigation and clean Home integration
   -> Slice 9 hardening, device acceptance and handoff
   -> Future: administrator web portal
 ```
@@ -339,7 +341,19 @@ Recipient reference
 - [ ] Empty/offline/error states provide truthful recovery actions.
 - [ ] Receipt data matches the transfer response and persisted ledger.
 
-## 12. Slice 8 — Navigation and Final Clean Home
+## 12. Slice 8 — App Compatibility, Re-entry Security, and Final Navigation
+
+### Slice 8A — Required client updates
+
+Add strict Android build metadata, a runtime-configured minimum-build policy, compatibility-first Flutter startup, global HTTP 426 handling, and a non-bypassable Update Required screen. Ship the version-aware candidate with enforcement disabled, verify it on Chris and Gio's devices, and activate enforcement only through a separately approved Gate 8A-R. This work requires no database migration and must preserve server sessions and unresolved transfer idempotency state.
+
+Detailed plan: [Slice 8A required-client-update plan](plan-kk10p-slice-8a-required-client-updates.md).
+
+### Slice 8B — Local re-entry security
+
+Use a six-digit local PIN as the primary returning-user unlock and fingerprint as a companion convenience method after PIN setup. Define secure enrollment/recovery, lifecycle lock timing, device-change behavior, and an immediate privacy cover so Android recent apps never reveal balances, Activity, or receipts. These local controls protect access to an already authenticated session; they do not replace server authentication or authorization.
+
+### Slice 8C — Navigation and Final Clean Home
 
 ### Scope
 

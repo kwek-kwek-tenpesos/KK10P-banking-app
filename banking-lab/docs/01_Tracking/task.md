@@ -1,29 +1,36 @@
-# Task Tracking: Slice 7 Activity, History, and Receipts
+# Task Tracking: Slice 8A Required Client Updates
 
 Template Version: Docs_ProjectWorkflowStarterKit_v2.0
 
-- Status: Slice 7 implementation, Gate 7R shared rollout, and the authorized pre-device commit are complete. Chris/Gio live verification remains.
-- Completed Gate: [OWASP ZAP Gate B archive](archive/task-2026-09-09-owasp-zap-gate-b.md).
+- Status: Build-2 candidate implemented, fully verified, and committed with enforcement disabled; Chris/Gio device acceptance and Gate 8A-R remain pending.
 - Parent Roadmap: [KK10P prototype-to-Flutter roadmap](../02_Planning/plan-kk10p-prototype-to-flutter-roadmap.md).
-- Completed Slice: [Slice 6 archive](archive/task-2026-09-10-kk10p-slice-6-flutter-internal-transfer.md).
-- Current Contracts: [Authentication](../04_Architecture/customer-authentication-contract.md), [accounts](../04_Architecture/customer-accounts-contract.md), [ledger/funding](../04_Architecture/ledger-development-funding-contract.md), [internal transfer](../04_Architecture/internal-transfer-contract.md), and [Activity/history](../04_Architecture/activity-history-contract.md).
-- Product Rule: PHP 0.01–50,000.00 per transfer and PHP 100,000.00 aggregate outgoing per source account per `Asia/Manila` day.
-- Approved Delivery Boundary: Slice 7 owns authenticated Activity/history, stable cursor pagination, compact direction/type filters, transaction detail, and historical receipts. See [approved Slice 7 plan](../02_Planning/plan-kk10p-slice-7-activity-history-receipts.md).
-- Prototype Boundary: Kotlin remains layout inspiration only. Flutter, the approved KK10P material, and the ASP.NET/PostgreSQL contracts remain authoritative.
-- Shared-State Boundary: Shared `banking_lab` contains four intentional, reconciled Slice 6 transfer transactions. Do not alter or clean them up without a separately reviewed data plan.
-- Current Execution State: Gate 7R passed with a verified backup, exact index migration, unchanged shared financial state, API restart, and authenticated read-only Activity smoke. The authorized Slice 7 commit is ready for Gio to pull; wait for Chris/Gio physical-device verification and do not create more money movement for Activity testing.
+- Active Plan: [Slice 8A required-client-update plan](../02_Planning/plan-kk10p-slice-8a-required-client-updates.md).
+- Completed Slice: [Slice 7 archive](archive/task-2026-09-10-kk10p-slice-7-activity-history.md).
+- Current Contracts: [Authentication](../04_Architecture/customer-authentication-contract.md), [accounts](../04_Architecture/customer-accounts-contract.md), [internal transfer](../04_Architecture/internal-transfer-contract.md), [Activity/history](../04_Architecture/activity-history-contract.md), and [client compatibility](../04_Architecture/client-compatibility-contract.md).
+- Confirmed Slice 8B Direction: Six-digit local PIN is the primary re-entry method; fingerprint is a later companion. Lifecycle locking and the recent-apps privacy cover belong to that separately planned slice.
+- Shared-State Boundary: Slice 8A requires no PostgreSQL migration, funding, transfer, or shared-data mutation.
+- Runtime Boundary: Candidate implementation keeps minimum-build enforcement disabled. Activation requires separate Gate 8A-R approval after Chris and Gio install and verify the supported build.
+- Current Execution State: Chris and Gio pull/install build 2 and complete the candidate checklist. Do not activate Gate 8A-R or push from Codex.
 
 ## Active Checklist
 
-- [x] Inspect roadmap, canonical contracts, current Flutter/backend patterns, and prototype layouts.
-- [x] Draft and obtain explicit approval for the feature-specific Slice 7 plan.
-- [x] Implement strict Activity list/detail contracts, guards, owner-scoped service, endpoints, and safe observability.
-- [x] Add and safety-review the additive posting-history index migration without applying it to shared `banking_lab`.
-- [x] Add backend contract, ownership, pagination, integrity, and disposable PostgreSQL tests.
-- [x] Implement strict Flutter Activity models/service/repository/controllers and invalidation.
-- [x] Implement protected responsive Activity list, compact filters, and full-screen historical receipt.
-- [x] Run focused and complete backend/Flutter verification and review the diff.
-- [x] Update canonical contract, walkthrough, changelog, and request separate Gate 7R approval.
-- [x] Complete Gate 7R backup, exact shared index rollout, reconciliation, restart, and authenticated read-only smoke without funding or transfers.
-- [x] Create the authorized commit before Chris/Gio device verification.
-- [ ] After Chris/Gio confirmation, archive this completed Slice 7 task and prepare the next slice separately.
+- [x] Record Chris/Gio acceptance and archive completed Slice 7.
+- [x] Inspect current Flutter versioning, shared Dio setup, startup/auth ordering, router, API pipeline, configuration, and error mapping.
+- [x] Define canonical Android build headers and strict parsing rules.
+- [x] Define the compatibility endpoint, governed-route matrix, and narrow exemptions.
+- [x] Define compatibility-first Flutter startup, global late-426 handling, and Update Required UI.
+- [x] Separate disabled candidate delivery from the later Gate 8A-R enforcement activation.
+- [x] Define backend, Flutter, security, error, edge-case, automated, and manual acceptance criteria.
+- [x] Record six-digit PIN, fingerprint companion, lifecycle lock, and privacy cover as Slice 8B.
+- [x] Obtain explicit approval for the Slice 8A plan.
+- [x] Implement Slice 8A with enforcement disabled.
+- [x] Complete automated/build verification and create the authorized candidate commit for Gio to pull.
+- [ ] After dual-device acceptance, request Gate 8A-R separately.
+
+## Candidate Verification Record
+
+- Backend: 279 passed, 0 failed, and 21 opt-in PostgreSQL tests skipped; no shared PostgreSQL test was enabled.
+- Flutter: formatting clean after normalization, analysis clean, and all 228 tests passed.
+- Android: debug APK assembled successfully. On this workstation, Kotlin incremental compilation had to be disabled for the clean build because the Pub cache is on `C:` and the project is on `D:`.
+- Runtime configuration: `ClientCompatibility:EnforcementEnabled` remains `false`; Gate 8A-R was not activated.
+- Data boundary: no migration, funding, transfer, or shared-database write was performed.

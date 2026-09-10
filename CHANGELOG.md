@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-09-10 — Slice 8A version-aware Android candidate
+- Added strict Android build metadata, an HTTPS compatibility endpoint and early API gate, compatibility-first Flutter startup, validated global HTTP 426 handling, and a responsive non-bypassable Update Required screen. Candidate `1.0.1+2` ships with enforcement disabled, preserves sessions and pending transfer recovery state, and makes no database or shared-money change. All 279 ordinary backend and 228 Flutter tests pass, analysis is clean, and the debug APK builds; Chris/Gio acceptance and Gate 8A-R remain pending.
+
 ### 2026-09-10 — Gate 7R shared Activity-index rollout
 - Backed up and reconciled shared `banking_lab`, applied only `20260910054031_AddActivityHistoryIndex` while the API was quiesced, verified the exact valid index and unchanged users/sessions/tokens/accounts/balances/eight journals, then restarted the API and passed authenticated no-store Activity list/detail smoke checks. No funding or transfer was executed.
 

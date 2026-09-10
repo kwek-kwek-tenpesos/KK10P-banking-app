@@ -29,9 +29,12 @@ class AuthenticationState {
 }
 
 class AuthenticationController extends StateNotifier<AuthenticationState> {
-  AuthenticationController(this._repository, this._preferences)
-    : super(const AuthenticationState.initializing()) {
-    unawaited(initialize());
+  AuthenticationController(
+    this._repository,
+    this._preferences, {
+    bool restoreAutomatically = true,
+  }) : super(const AuthenticationState.initializing()) {
+    if (restoreAutomatically) unawaited(initialize());
   }
 
   final AuthenticationRepository _repository;
@@ -61,6 +64,8 @@ class AuthenticationController extends StateNotifier<AuthenticationState> {
               status: AuthenticationStatus.signedIn,
               customer: session.customer,
             );
+    } on ClientUpgradeRequiredFailure {
+      rethrow;
     } on AppFailure catch (failure) {
       if (!mounted || operation != _operation) return;
       state = AuthenticationState(
@@ -176,5 +181,8 @@ final authenticationControllerProvider =
       return AuthenticationController(
         ref.watch(authenticationRepositoryProvider),
         ref.read(appPreferencesControllerProvider.notifier),
+        restoreAutomatically: ref.watch(authenticationAutomaticRestoreProvider),
       );
     });
+
+final authenticationAutomaticRestoreProvider = Provider<bool>((ref) => false);
